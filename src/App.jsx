@@ -1,22 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useGameState } from './useGameState';
+import { useGameState, hasSaveData } from './useGameState';
 import HUD from './HUD';
 import ExploreScreen from './ExploreScreen';
 import BattleScreen from './BattleScreen';
 import ShopScreen from './ShopScreen';
 import InventoryModal from './InventoryModal';
+import QuestBoard from './QuestBoard';
 import { TitleScreen, GameOverScreen, VictoryScreen } from './SpecialScreens';
 import './App.css';
 
 export default function App() {
   const {
-    player, screen, setScreen, battleState, log, notification,
+    player, screen, setScreen, battleState, log, notification, quests,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
-    resolveVictory, useItem, buyItem, rest, resetGame, addLog,
+    resolveVictory, useItem, buyItem, rest, resetGame, claimQuest, addLog,
   } = useGameState();
 
-  const [showShop, setShowShop] = useState(false);
+  const [showShop, setShowShop]           = useState(false);
   const [showInventory, setShowInventory] = useState(false);
+  const [showQuests, setShowQuests]       = useState(false);
+  const [saveExists]                      = useState(() => hasSaveData());
 
   // Check player death during battle
   useEffect(() => {
@@ -36,27 +39,38 @@ export default function App() {
     }
   };
 
-  if (screen === 'title') return <TitleScreen onStart={() => setScreen('explore')} />;
+  if (screen === 'title') return (
+    <TitleScreen
+      hasSave={saveExists}
+      onContinue={() => setScreen('explore')}
+      onStart={resetGame}
+    />
+  );
   if (screen === 'gameover') return <GameOverScreen player={player} onRestart={resetGame} />;
-  if (screen === 'victory') return <VictoryScreen player={player} onRestart={resetGame} />;
+  if (screen === 'victory')  return <VictoryScreen  player={player} onRestart={resetGame} />;
 
   return (
     <div className="app">
       {notification && (
-        <div className={`toast toast--${notification.type}`}>
-          {notification.msg}
-        </div>
+        <div className={`toast toast--${notification.type}`}>{notification.msg}</div>
       )}
 
-      <HUD player={player} onInventory={() => setShowInventory(true)} />
+      <HUD
+        player={player}
+        quests={quests}
+        onInventory={() => setShowInventory(true)}
+        onQuestBoard={() => setShowQuests(true)}
+      />
 
       <main className="main-content">
         {screen === 'explore' && (
           <ExploreScreen
             player={player}
+            quests={quests}
             onTravel={travel}
             onStartBattle={startBattle}
             onShop={() => setShowShop(true)}
+            onQuestBoard={() => setShowQuests(true)}
             onRest={rest}
             log={log}
           />
@@ -78,19 +92,13 @@ export default function App() {
       </main>
 
       {showShop && (
-        <ShopScreen
-          player={player}
-          onBuy={buyItem}
-          onClose={() => setShowShop(false)}
-        />
+        <ShopScreen player={player} onBuy={buyItem} onClose={() => setShowShop(false)} />
       )}
-
       {showInventory && (
-        <InventoryModal
-          player={player}
-          onUse={(item) => useItem(item, false)}
-          onClose={() => setShowInventory(false)}
-        />
+        <InventoryModal player={player} onUse={(item) => useItem(item, false)} onClose={() => setShowInventory(false)} />
+      )}
+      {showQuests && (
+        <QuestBoard quests={quests} onClaim={claimQuest} onClose={() => setShowQuests(false)} />
       )}
     </div>
   );

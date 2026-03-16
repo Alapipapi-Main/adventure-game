@@ -98,6 +98,26 @@
 .btnSub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
 .fightBtn:hover { border-color: var(--blood-light); background: rgba(139,0,0,0.15); }
+.questBtn:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+
+.questBadge {
+  display: inline-block;
+  margin-left: 8px;
+  background: var(--gold);
+  color: var(--bg-deepest);
+  font-size: 0.6rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 10px;
+  vertical-align: middle;
+  animation: badgePulse 1.5s infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
 .bossBtn { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.05); }
 .bossBtn:hover { border-color: var(--gold); background: rgba(201,168,76,0.12); }
 .shopBtn:hover { border-color: #2ecc71; background: rgba(46,204,113,0.1); }

@@ -1,12 +1,51 @@
-import { useState, useCallback } from 'react';
-import { ENEMIES, LOCATIONS, WEAPONS, ARMORS, INITIAL_PLAYER, getXpToNext, getLevelStats } from './gameData';
+import { useState, useCallback, useEffect } from 'react';
+import {
+  ENEMIES, LOCATIONS, WEAPONS, ARMORS,
+  INITIAL_PLAYER, INITIAL_QUESTS, QUESTS,
+  getXpToNext, getLevelStats,
+} from './gameData';
+
+const SAVE_KEY = 'vorhaan_save_v1';
+
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function writeSave(data) {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch {}
+}
+
+export function hasSaveData() {
+  return !!localStorage.getItem(SAVE_KEY);
+}
+
+export function deleteSave() {
+  localStorage.removeItem(SAVE_KEY);
+}
 
 export function useGameState() {
-  const [player, setPlayer] = useState(() => JSON.parse(JSON.stringify(INITIAL_PLAYER)));
-  const [screen, setScreen] = useState('title'); // title | explore | battle | shop | inventory | gameover | victory
+  const saved = loadSave();
+
+  const [player, setPlayer] = useState(() =>
+    saved?.player ?? JSON.parse(JSON.stringify(INITIAL_PLAYER))
+  );
+  const [screen, setScreen] = useState(() => saved ? 'explore' : 'title');
   const [battleState, setBattleState] = useState(null);
-  const [log, setLog] = useState([]);
+  const [log, setLog] = useState(() => saved?.log ?? []);
   const [notification, setNotification] = useState(null);
+  const [quests, setQuests] = useState(() =>
+    saved?.quests ?? JSON.parse(JSON.stringify(INITIAL_QUESTS))
+  );
+
+  // Auto-save whenever player or quests change
+  useEffect(() => {
+    if (screen === 'title') return;
+    writeSave({ player, quests, log: log.slice(-20) });
+  }, [player, quests]);
 
   const addLog = useCallback((msg, type = 'normal') => {
     setLog(prev => [...prev.slice(-40), { msg, type, id: Date.now() + Math.random() }]);
@@ -17,15 +56,52 @@ export function useGameState() {
     setTimeout(() => setNotification(null), 2500);
   }, []);
 
+  // ── Quest helpers ────────────────────────────────────────────────────────────
+  const advanceQuests = useCallback((type, target) => {
+    setQuests(prev => prev.map(q => {
+      if (q.status !== 'active') return q;
+      const def = QUESTS.find(d => d.id === q.id);
+      if (!def) return q;
+      let hit = false;
+      if (def.type === 'kill_any' && type === 'kill') hit = true;
+      if (def.type === 'kill_enemy' && type === 'kill' && def.target === target) hit = true;
+      if (def.type === 'visit_location' && type === 'visit' && def.target === target) hit = true;
+      if (!hit) return q;
+      const newProgress = q.progress + 1;
+      if (newProgress >= def.goal) {
+        notify(`📜 Quest Complete: ${def.title}!`, 'levelup');
+        addLog(`📜 Quest Complete: "${def.title}"! Claim reward at the Tavern.`, 'levelup');
+        return { ...q, progress: newProgress, status: 'completed' };
+      }
+      return { ...q, progress: newProgress };
+    }));
+  }, [notify, addLog]);
+
+  const claimQuest = useCallback((questId) => {
+    const def = QUESTS.find(d => d.id === questId);
+    if (!def) return;
+    setQuests(prev => prev.map(q => q.id === questId ? { ...q, status: 'claimed' } : q));
+    setPlayer(p => ({
+      ...p,
+      gold: p.gold + def.reward.gold,
+      xp: p.xp + def.reward.xp,
+    }));
+    addLog(`💰 Claimed reward: +${def.reward.gold} Gold, +${def.reward.xp} XP`, 'victory');
+    notify(`Reward claimed! +${def.reward.gold}g +${def.reward.xp}xp`, 'success');
+  }, [addLog, notify]);
+
+  // ── Navigation ───────────────────────────────────────────────────────────────
   const travel = useCallback((locationId) => {
     setPlayer(p => ({ ...p, location: locationId }));
     addLog(`You travel to ${LOCATIONS[locationId].name}.`, 'travel');
     setScreen('explore');
-  }, [addLog]);
+    advanceQuests('visit', locationId);
+  }, [addLog, advanceQuests]);
 
+  // ── Battle ───────────────────────────────────────────────────────────────────
   const startBattle = useCallback((enemyId) => {
     const enemy = JSON.parse(JSON.stringify(ENEMIES[enemyId]));
-    setBattleState({ enemy, turn: 'player', buffs: { atk: 0 }, round: 1 });
+    setBattleState({ enemy, turn: 'player', buffs: { atk: 0 }, round: 1, lastDmg: null, lastHit: null });
     setScreen('battle');
     addLog(`⚔️ A ${enemy.name} appears!`, 'danger');
   }, [addLog]);
@@ -33,47 +109,53 @@ export function useGameState() {
   const playerAttack = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
     const atk = player.atk + player.weapon.atk + battleState.buffs.atk;
-    const dmg = Math.max(1, atk - battleState.enemy.def + Math.floor(Math.random() * 6) - 2);
+    const raw = Math.max(1, atk - battleState.enemy.def + Math.floor(Math.random() * 6) - 2);
     const isCrit = Math.random() < 0.15;
-    const finalDmg = isCrit ? Math.floor(dmg * 1.75) : dmg;
+    const finalDmg = isCrit ? Math.floor(raw * 1.75) : raw;
 
     addLog(`${isCrit ? '💥 Critical! ' : ''}You deal ${finalDmg} damage to ${battleState.enemy.name}.`, isCrit ? 'crit' : 'player');
 
     setBattleState(prev => {
       const newHp = Math.max(0, prev.enemy.hp - finalDmg);
-      const updatedEnemy = { ...prev.enemy, hp: newHp };
-      if (newHp <= 0) {
-        return { ...prev, enemy: updatedEnemy, turn: 'resolved' };
-      }
-      return { ...prev, enemy: updatedEnemy, turn: 'enemy' };
+      const next = {
+        ...prev,
+        enemy: { ...prev.enemy, hp: newHp },
+        lastDmg: { value: finalDmg, isCrit, target: 'enemy', id: Date.now() },
+        lastHit: { target: 'enemy', id: Date.now() },
+      };
+      return newHp <= 0
+        ? { ...next, turn: 'resolved' }
+        : { ...next, turn: 'enemy' };
     });
   }, [battleState, player, addLog]);
 
   const playerDefend = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
-    addLog(`🛡️ You take a defensive stance, reducing incoming damage.`, 'player');
-    setBattleState(prev => ({ ...prev, turn: 'enemy_defend', defendBonus: 10 }));
+    addLog('🛡️ You take a defensive stance, reducing incoming damage.', 'player');
+    setBattleState(prev => ({ ...prev, turn: 'enemy_defend', defendBonus: 10, lastDmg: null }));
   }, [battleState, addLog]);
 
   const useItem = useCallback((item, inBattle = false) => {
     setPlayer(p => {
-      const inv = p.inventory.filter((_, i) => p.inventory.indexOf(item) !== i || (p.inventory.slice(0, i).filter(x => x.id === item.id).length > 0));
-      const idx = p.inventory.findIndex(x => x.id === item.id);
       const newInv = [...p.inventory];
+      const idx = newInv.findIndex(x => x.id === item.id);
+      if (idx === -1) return p;
       newInv.splice(idx, 1);
       let newHp = p.hp;
-      let newAtk = p.atk;
       if (item.effect === 'heal') {
-        newHp = Math.min(p.maxHp, p.hp + item.value);
-        addLog(`💊 You use ${item.name} and restore ${Math.min(item.value, p.maxHp - p.hp)} HP.`, 'heal');
+        const healed = Math.min(item.value, p.maxHp - p.hp);
+        newHp = p.hp + healed;
+        addLog(`💊 You use ${item.name} and restore ${healed} HP.`, 'heal');
       }
       return { ...p, hp: newHp, inventory: newInv };
     });
     if (inBattle && item.effect === 'buff') {
-      setBattleState(prev => prev ? { ...prev, buffs: { ...prev.buffs, atk: prev.buffs.atk + item.value } } : prev);
+      setBattleState(prev => prev
+        ? { ...prev, buffs: { ...prev.buffs, atk: prev.buffs.atk + item.value } }
+        : prev);
       addLog(`✨ You use ${item.name}! ATK +${item.value} for this battle.`, 'buff');
     }
-    if (inBattle && item.effect === 'heal') {
+    if (inBattle) {
       setBattleState(prev => prev ? { ...prev, turn: 'enemy' } : prev);
     }
   }, [addLog]);
@@ -87,18 +169,24 @@ export function useGameState() {
 
     addLog(`${battleState.enemy.icon} ${battleState.enemy.name} attacks you for ${dmg} damage!`, 'danger');
 
-    setPlayer(p => {
-      const newHp = Math.max(0, p.hp - dmg);
-      return { ...p, hp: newHp };
-    });
-
-    setBattleState(prev => ({ ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1 }));
+    setPlayer(p => ({ ...p, hp: Math.max(0, p.hp - dmg) }));
+    setBattleState(prev => ({
+      ...prev,
+      turn: 'player',
+      defendBonus: 0,
+      round: (prev.round || 1) + 1,
+      lastDmg: { value: dmg, isCrit: false, target: 'player', id: Date.now() },
+      lastHit: { target: 'player', id: Date.now() },
+    }));
   }, [battleState, player, addLog]);
 
   const resolveVictory = useCallback(() => {
     if (!battleState) return;
     const { enemy } = battleState;
     addLog(`🏆 You defeated ${enemy.name}! +${enemy.xp} XP, +${enemy.gold} Gold`, 'victory');
+
+    // Advance quests before updating player
+    advanceQuests('kill', enemy.id);
 
     setPlayer(p => {
       let newXp = p.xp + enemy.xp;
@@ -143,21 +231,20 @@ export function useGameState() {
     });
 
     setBattleState(null);
-
-    // Check win condition
     if (enemy.id === 'shadow_king') {
       setTimeout(() => setScreen('victory'), 500);
     } else {
       setTimeout(() => setScreen('explore'), 300);
     }
-  }, [battleState, addLog, notify]);
+  }, [battleState, addLog, notify, advanceQuests]);
 
+  // ── Shop ─────────────────────────────────────────────────────────────────────
   const buyItem = useCallback((item) => {
     if (player.gold < item.price) { notify('Not enough gold!', 'error'); return; }
-    if (item.type === 'weapon' || WEAPONS.find(w => w.id === item.id)) {
+    if (WEAPONS.find(w => w.id === item.id)) {
       setPlayer(p => ({ ...p, gold: p.gold - item.price, weapon: item }));
       notify(`Equipped ${item.name}!`, 'success');
-    } else if (item.type === 'armor' || ARMORS.find(a => a.id === item.id)) {
+    } else if (ARMORS.find(a => a.id === item.id)) {
       setPlayer(p => ({ ...p, gold: p.gold - item.price, armor: item }));
       notify(`Equipped ${item.name}!`, 'success');
     } else {
@@ -173,16 +260,19 @@ export function useGameState() {
     notify('Fully rested!', 'success');
   }, [addLog, notify]);
 
+  // ── Save / Reset ─────────────────────────────────────────────────────────────
   const resetGame = useCallback(() => {
+    deleteSave();
     setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
+    setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
     setScreen('title');
     setBattleState(null);
     setLog([]);
   }, []);
 
   return {
-    player, screen, setScreen, battleState, log, notification,
+    player, screen, setScreen, battleState, log, notification, quests,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
-    resolveVictory, useItem, buyItem, rest, resetGame, addLog, notify,
+    resolveVictory, useItem, buyItem, rest, resetGame, claimQuest, addLog, notify,
   };
 }

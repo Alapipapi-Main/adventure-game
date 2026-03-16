@@ -17,6 +17,7 @@ export const LOCATIONS = {
     enemies: [],
     loot: [{ id: 'health_potion', name: 'Health Potion', type: 'consumable', effect: 'heal', value: 40, icon: '🧪', description: 'Restores 40 HP' }],
     shopItems: true,
+    hasQuestBoard: true,
   },
   blacksmith: {
     id: 'blacksmith',
@@ -60,7 +61,7 @@ export const LOCATIONS = {
   },
   ancient_ruins: {
     id: 'ancient_ruins',
-    name: 'Ancient Ruins of Vor\'thaan',
+    name: "Ancient Ruins of Vor'thaan",
     description: 'The ruins of a once-great civilization. The air crackles with dark magic. At the center looms a massive obsidian throne — and upon it sits the Shadow King.',
     image: '🏚️',
     exits: ['dark_wood'],
@@ -91,7 +92,7 @@ export const WEAPONS = [
   { id: 'iron_sword', name: 'Iron Sword', icon: '⚔️', atk: 12, price: 80, description: 'A sturdy iron sword', tier: 2 },
   { id: 'steel_blade', name: 'Steel Blade', icon: '🔪', atk: 22, price: 200, description: 'Forged from fine steel', tier: 3 },
   { id: 'enchanted_sword', name: 'Enchanted Sword', icon: '✨', atk: 35, price: 450, description: 'Glows with arcane power', tier: 4 },
-  { id: 'shadowbane', name: "Shadowbane", icon: '🌟', atk: 55, price: 900, description: 'A legendary blade that slays darkness', tier: 5 },
+  { id: 'shadowbane', name: 'Shadowbane', icon: '🌟', atk: 55, price: 900, description: 'A legendary blade that slays darkness', tier: 5 },
 ];
 
 export const ARMORS = [
@@ -108,6 +109,75 @@ export const SHOP_ITEMS = [
   { id: 'elixir', name: 'Elixir of Power', type: 'consumable', effect: 'buff', value: 20, icon: '✨', price: 100, description: 'Boosts ATK by 20 for battle' },
   { id: 'antidote', name: 'Antidote', type: 'consumable', effect: 'cure', value: 0, icon: '🌿', price: 25, description: 'Cures poison' },
 ];
+
+// ── Quest definitions ─────────────────────────────────────────────────────────
+export const QUESTS = [
+  {
+    id: 'first_blood',
+    title: 'First Blood',
+    description: 'Slay your first enemy to prove you are worthy.',
+    icon: '🗡️',
+    type: 'kill_any',
+    goal: 1,
+    reward: { gold: 30, xp: 50 },
+  },
+  {
+    id: 'goblin_slayer',
+    title: 'Goblin Slayer',
+    description: 'The village is plagued by goblins. Kill 5 of them.',
+    icon: '👺',
+    type: 'kill_enemy',
+    target: 'goblin',
+    goal: 5,
+    reward: { gold: 80, xp: 120 },
+  },
+  {
+    id: 'wolf_hunter',
+    title: 'Wolf Hunter',
+    description: 'Dire wolves stalk the forest roads. Slay 3.',
+    icon: '🐺',
+    type: 'kill_enemy',
+    target: 'wolf',
+    goal: 3,
+    reward: { gold: 60, xp: 90 },
+  },
+  {
+    id: 'deep_explorer',
+    title: 'Into the Dark',
+    description: 'Venture into the Dark Wood and survive.',
+    icon: '🌑',
+    type: 'visit_location',
+    target: 'dark_wood',
+    goal: 1,
+    reward: { gold: 50, xp: 80 },
+  },
+  {
+    id: 'orc_bane',
+    title: 'Orc Bane',
+    description: 'Orcs have set up a camp in the Dark Wood. Defeat 3.',
+    icon: '👹',
+    type: 'kill_enemy',
+    target: 'orc',
+    goal: 3,
+    reward: { gold: 120, xp: 200 },
+  },
+  {
+    id: 'shadow_king_quest',
+    title: 'End the Darkness',
+    description: 'Defeat the Shadow King and restore light to Vor\'thaan.',
+    icon: '👑',
+    type: 'kill_enemy',
+    target: 'shadow_king',
+    goal: 1,
+    reward: { gold: 500, xp: 1000 },
+  },
+];
+
+export const INITIAL_QUESTS = QUESTS.map(q => ({
+  id: q.id,
+  status: 'active',   // active | completed | claimed
+  progress: 0,
+}));
 
 export const INITIAL_PLAYER = {
   name: 'Hero',

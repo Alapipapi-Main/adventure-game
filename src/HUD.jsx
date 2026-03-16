@@ -1,9 +1,10 @@
 import styles from './HUD.module.css';
 
-export default function HUD({ player, onInventory }) {
-  const hpPct = (player.hp / player.maxHp) * 100;
-  const xpPct = (player.xp / player.xpToNext) * 100;
+export default function HUD({ player, quests, onInventory, onQuestBoard }) {
+  const hpPct  = (player.hp / player.maxHp) * 100;
+  const xpPct  = (player.xp / player.xpToNext) * 100;
   const hpColor = hpPct > 60 ? 'var(--hp-green)' : hpPct > 30 ? 'var(--hp-yellow)' : 'var(--hp-red)';
+  const readyQuests = quests.filter(q => q.status === 'completed').length;
 
   return (
     <div className={styles.hud}>
@@ -32,6 +33,10 @@ export default function HUD({ player, onInventory }) {
       <div className={styles.right}>
         <span className={styles.gold}>💰 {player.gold}</span>
         <button className={styles.invBtn} onClick={onInventory}>🎒 Bag ({player.inventory.length})</button>
+        <button className={styles.questHudBtn} onClick={onQuestBoard}>
+          📜 Quests
+          {readyQuests > 0 && <span className={styles.hudBadge}>{readyQuests}</span>}
+        </button>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LOCATIONS, ENEMIES } from './gameData';
 import styles from './ExploreScreen.module.css';
 
-export default function ExploreScreen({ player, onTravel, onStartBattle, onShop, onRest, log }) {
+export default function ExploreScreen({ player, quests, onTravel, onStartBattle, onShop, onQuestBoard, onRest, log }) {
   const location = LOCATIONS[player.location];
   const [searching, setSearching] = useState(false);
 
@@ -10,15 +10,16 @@ export default function ExploreScreen({ player, onTravel, onStartBattle, onShop,
     setSearching(true);
     setTimeout(() => {
       setSearching(false);
-      // Always trigger a battle — that's what the button promises
       const enemyId = location.enemies[Math.floor(Math.random() * location.enemies.length)];
       onStartBattle(enemyId);
     }, 600);
   };
 
-  const canRest = player.location === 'village' || player.location === 'tavern';
-  const hasShop = location.shopItems;
-  const hasBoss = location.boss && !player.defeatedBosses.includes(location.boss);
+  const canRest     = player.location === 'village' || player.location === 'tavern';
+  const hasShop     = location.shopItems;
+  const hasQuestBoard = location.hasQuestBoard;
+  const hasBoss     = location.boss && !player.defeatedBosses.includes(location.boss);
+  const readyQuests = quests.filter(q => q.status === 'completed').length;
 
   return (
     <div className={styles.wrap}>
@@ -35,10 +36,7 @@ export default function ExploreScreen({ player, onTravel, onStartBattle, onShop,
           <h3 className={styles.sectionTitle}>Actions</h3>
 
           {hasBoss && (
-            <button
-              className={`${styles.actionBtn} ${styles.bossBtn}`}
-              onClick={() => onStartBattle(location.boss)}
-            >
+            <button className={`${styles.actionBtn} ${styles.bossBtn}`} onClick={() => onStartBattle(location.boss)}>
               <span>👑</span>
               <div>
                 <div className={styles.btnTitle}>Challenge the Boss</div>
@@ -48,15 +46,24 @@ export default function ExploreScreen({ player, onTravel, onStartBattle, onShop,
           )}
 
           {location.enemies.length > 0 && (
-            <button
-              className={`${styles.actionBtn} ${styles.fightBtn}`}
-              onClick={handleSearch}
-              disabled={searching}
-            >
+            <button className={`${styles.actionBtn} ${styles.fightBtn}`} onClick={handleSearch} disabled={searching}>
               <span>{searching ? '🔍' : '⚔️'}</span>
               <div>
                 <div className={styles.btnTitle}>{searching ? 'Searching...' : 'Explore & Fight'}</div>
                 <div className={styles.btnSub}>Search for enemies to battle</div>
+              </div>
+            </button>
+          )}
+
+          {hasQuestBoard && (
+            <button className={`${styles.actionBtn} ${styles.questBtn}`} onClick={onQuestBoard}>
+              <span>📜</span>
+              <div>
+                <div className={styles.btnTitle}>
+                  Quest Board
+                  {readyQuests > 0 && <span className={styles.questBadge}>{readyQuests} ready</span>}
+                </div>
+                <div className={styles.btnSub}>View bounties & claim rewards</div>
               </div>
             </button>
           )}
@@ -86,16 +93,12 @@ export default function ExploreScreen({ player, onTravel, onStartBattle, onShop,
           {location.exits.map(exitId => {
             const exit = LOCATIONS[exitId];
             return (
-              <button
-                key={exitId}
-                className={`${styles.actionBtn} ${styles.travelBtn}`}
-                onClick={() => onTravel(exitId)}
-              >
+              <button key={exitId} className={`${styles.actionBtn} ${styles.travelBtn}`} onClick={() => onTravel(exitId)}>
                 <span>{exit.image}</span>
                 <div>
                   <div className={styles.btnTitle}>{exit.name}</div>
                   <div className={styles.btnSub}>
-                    {exit.enemies.length > 0 ? `⚔️ Dangerous` : '🕊️ Safe area'}
+                    {exit.enemies.length > 0 ? '⚔️ Dangerous' : '🕊️ Safe area'}
                     {exit.boss && !player.defeatedBosses.includes(exit.boss) ? ' · Boss here' : ''}
                   </div>
                 </div>

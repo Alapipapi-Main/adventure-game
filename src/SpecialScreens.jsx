@@ -1,6 +1,6 @@
 import styles from './SpecialScreens.module.css';
 
-export function TitleScreen({ onStart }) {
+export function TitleScreen({ onStart, onContinue, hasSave }) {
   return (
     <div className={styles.titleWrap}>
       <div className={styles.stars} aria-hidden>
@@ -28,15 +28,23 @@ export function TitleScreen({ onStart }) {
         <div className={styles.features}>
           <div className={styles.feature}><span>⚔️</span> Turn-based Combat</div>
           <div className={styles.feature}><span>🗺️</span> Explore 6 Locations</div>
-          <div className={styles.feature}><span>🛒</span> Weapons & Armor Shop</div>
+          <div className={styles.feature}><span>📜</span> Quest System</div>
           <div className={styles.feature}><span>👑</span> Epic Boss Battle</div>
         </div>
 
+        {hasSave && (
+          <button className={styles.continueBtn} onClick={onContinue}>
+            ▶ Continue Adventure
+          </button>
+        )}
+
         <button className={styles.startBtn} onClick={onStart}>
-          Begin Your Journey
+          {hasSave ? 'New Game' : 'Begin Your Journey'}
         </button>
 
-        <p className={styles.hint}>Arrow keys to navigate · Click to interact</p>
+        {hasSave && (
+          <p className={styles.saveNote}>⚠️ Starting a new game will erase your saved progress.</p>
+        )}
       </div>
     </div>
   );
@@ -54,9 +62,7 @@ export function GameOverScreen({ player, onRestart }) {
           <div className={styles.statRow}><span>Enemies Slain</span><span>{player.totalKills}</span></div>
           <div className={styles.statRow}><span>Gold Gathered</span><span>{player.gold}</span></div>
         </div>
-        <button className={styles.restartBtn} onClick={onRestart}>
-          Rise Again
-        </button>
+        <button className={styles.restartBtn} onClick={onRestart}>Rise Again</button>
       </div>
     </div>
   );
@@ -75,9 +81,7 @@ export function VictoryScreen({ player, onRestart }) {
           <div className={styles.statRow}><span>Gold Collected</span><span>{player.gold}</span></div>
           <div className={styles.statRow}><span>Weapon</span><span>{player.weapon.name}</span></div>
         </div>
-        <button className={styles.playAgainBtn} onClick={onRestart}>
-          Play Again
-        </button>
+        <button className={styles.playAgainBtn} onClick={onRestart}>Play Again</button>
       </div>
     </div>
   );
