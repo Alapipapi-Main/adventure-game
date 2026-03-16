@@ -129,6 +129,72 @@
   margin-top: 8px;
 }
 
+.eraseBtn {
+  background: transparent;
+  border: 1px solid rgba(231,76,60,0.3);
+  color: rgba(231,76,60,0.6);
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.eraseBtn:hover {
+  background: rgba(231,76,60,0.1);
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.confirmBox {
+  background: rgba(139,0,0,0.15);
+  border: 1px solid rgba(231,76,60,0.4);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 8px;
+  animation: fadeInUp 0.2s ease;
+}
+
+.confirmText {
+  font-size: 0.8rem;
+  color: #ffaaaa;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.confirmBtns { display: flex; gap: 8px; }
+
+.confirmYes {
+  flex: 1;
+  background: rgba(231,76,60,0.2);
+  border: 1px solid #e74c3c;
+  color: #ffaaaa;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.confirmYes:hover { background: rgba(231,76,60,0.35); }
+
+.confirmNo {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.confirmNo:hover { background: rgba(255,255,255,0.08); color: var(--text-bright); }
+
 .startBtn {
   background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.05));
   border: 1px solid var(--gold);

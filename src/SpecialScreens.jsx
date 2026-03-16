@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import styles from './SpecialScreens.module.css';
 
-export function TitleScreen({ onStart, onContinue, hasSave }) {
+export function TitleScreen({ onStart, onContinue, onEraseSave, hasSave }) {
+  const [confirmErase, setConfirmErase] = useState(false);
+
   return (
     <div className={styles.titleWrap}>
       <div className={styles.stars} aria-hidden>
@@ -39,11 +42,27 @@ export function TitleScreen({ onStart, onContinue, hasSave }) {
         )}
 
         <button className={styles.startBtn} onClick={onStart}>
-          {hasSave ? 'New Game' : 'Begin Your Journey'}
+          {hasSave ? '⚔️ New Game' : 'Begin Your Journey'}
         </button>
 
-        {hasSave && (
-          <p className={styles.saveNote}>⚠️ Starting a new game will erase your saved progress.</p>
+        {hasSave && !confirmErase && (
+          <button className={styles.eraseBtn} onClick={() => setConfirmErase(true)}>
+            🗑️ Erase Save Data
+          </button>
+        )}
+
+        {hasSave && confirmErase && (
+          <div className={styles.confirmBox}>
+            <p className={styles.confirmText}>⚠️ This will permanently delete your save. Are you sure?</p>
+            <div className={styles.confirmBtns}>
+              <button className={styles.confirmYes} onClick={onEraseSave}>Yes, delete it</button>
+              <button className={styles.confirmNo} onClick={() => setConfirmErase(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {hasSave && !confirmErase && (
+          <p className={styles.saveNote}>💾 Save data detected — your progress is safe</p>
         )}
       </div>
     </div>

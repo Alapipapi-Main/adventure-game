@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useGameState, hasSaveData } from './useGameState';
+import { useGameState, hasSaveData, deleteSave } from './useGameState';
 import HUD from './HUD';
 import ExploreScreen from './ExploreScreen';
 import BattleScreen from './BattleScreen';
@@ -43,6 +43,7 @@ export default function App() {
       hasSave={hasSaveData()}
       onContinue={() => setScreen('explore')}
       onStart={startNewGame}
+      onEraseSave={() => { deleteSave(); window.location.reload(); }}
     />
   );
   if (screen === 'gameover') return <GameOverScreen player={player} onRestart={startNewGame} />;

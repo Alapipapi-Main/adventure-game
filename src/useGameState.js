@@ -33,7 +33,7 @@ export function useGameState() {
   const [player, setPlayer] = useState(() =>
     saved?.player ?? JSON.parse(JSON.stringify(INITIAL_PLAYER))
   );
-  const [screen, setScreen] = useState(() => saved ? 'explore' : 'title');
+  const [screen, setScreen] = useState('title');
   const [battleState, setBattleState] = useState(null);
   const [log, setLog] = useState(() => saved?.log ?? []);
   const [notification, setNotification] = useState(null);
