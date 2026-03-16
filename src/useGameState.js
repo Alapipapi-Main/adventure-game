@@ -41,11 +41,11 @@ export function useGameState() {
     saved?.quests ?? JSON.parse(JSON.stringify(INITIAL_QUESTS))
   );
 
-  // Auto-save whenever player or quests change
+  // Auto-save whenever player, quests, or screen changes (skip non-gameplay screens)
   useEffect(() => {
-    if (screen === 'title') return;
+    if (screen === 'title' || screen === 'gameover' || screen === 'victory') return;
     writeSave({ player, quests, log: log.slice(-20) });
-  }, [player, quests]);
+  }, [player, quests, screen]);
 
   const addLog = useCallback((msg, type = 'normal') => {
     setLog(prev => [...prev.slice(-40), { msg, type, id: Date.now() + Math.random() }]);
@@ -265,14 +265,23 @@ export function useGameState() {
     deleteSave();
     setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
     setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
-    setScreen('title');
     setBattleState(null);
     setLog([]);
+    setScreen('title');
+  }, []);
+
+  const startNewGame = useCallback(() => {
+    deleteSave();
+    setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
+    setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+    setBattleState(null);
+    setLog([]);
+    setScreen('explore');
   }, []);
 
   return {
     player, screen, setScreen, battleState, log, notification, quests,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
-    resolveVictory, useItem, buyItem, rest, resetGame, claimQuest, addLog, notify,
+    resolveVictory, useItem, buyItem, rest, resetGame, startNewGame, claimQuest, addLog, notify,
   };
 }

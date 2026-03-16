@@ -13,13 +13,12 @@ export default function App() {
   const {
     player, screen, setScreen, battleState, log, notification, quests,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
-    resolveVictory, useItem, buyItem, rest, resetGame, claimQuest, addLog,
+    resolveVictory, useItem, buyItem, rest, resetGame, startNewGame, claimQuest, addLog,
   } = useGameState();
 
   const [showShop, setShowShop]           = useState(false);
   const [showInventory, setShowInventory] = useState(false);
   const [showQuests, setShowQuests]       = useState(false);
-  const [saveExists]                      = useState(() => hasSaveData());
 
   // Check player death during battle
   useEffect(() => {
@@ -41,13 +40,15 @@ export default function App() {
 
   if (screen === 'title') return (
     <TitleScreen
-      hasSave={saveExists}
+      hasSave={hasSaveData()}
       onContinue={() => setScreen('explore')}
-      onStart={resetGame}
+      onStart={startNewGame}
     />
   );
-  if (screen === 'gameover') return <GameOverScreen player={player} onRestart={resetGame} />;
-  if (screen === 'victory')  return <VictoryScreen  player={player} onRestart={resetGame} />;
+  if (screen === 'gameover') return <GameOverScreen player={player} onRestart={startNewGame} />;
+  if (screen === 'victory')  return <VictoryScreen  player={player} onRestart={startNewGame} />;
+
+  const readyQuests = quests.filter(q => q.status === 'completed').length;
 
   return (
     <div className="app">
