@@ -37,7 +37,6 @@ export default function AudioSettings({ musicVol, sfxVol, onMusicVol, onSfxVol, 
           </div>
 
           <p className={styles.hint}>
-            Music plays automatically as you explore and battle.<br />
             Set either slider to 0 to mute.
           </p>
         </div>

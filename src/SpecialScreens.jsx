@@ -4,9 +4,9 @@ import SaveSlotPicker from './SaveSlotPicker';
 import styles from './SpecialScreens.module.css';
 
 // ── Title ────────────────────────────────────────────────────────────────────
-export function TitleScreen({ onNewGame, onContinue, hasAnySave }) {
+export function TitleScreen({ onNewGame, onContinue, hasAnySave, onInteract }) {
   return (
-    <div className={styles.titleWrap}>
+    <div className={styles.titleWrap} onClick={onInteract}>
       <div className={styles.stars} aria-hidden>
         {Array.from({ length: 50 }).map((_, i) => (
           <div key={i} className={styles.star} style={{
@@ -55,14 +55,14 @@ export function TitleScreen({ onNewGame, onContinue, hasAnySave }) {
 }
 
 // ── Game Over ─────────────────────────────────────────────────────────────────
-export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, onGoTitle }) {
+export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, onGoTitle, onInteract }) {
   const [showPicker, setShowPicker] = useState(false);
   const slots       = getAllSlots();
   const otherSlots  = slots.filter(s => !s.empty && s.slot !== activeSlot);
   const hasOthers   = otherSlots.length > 0;
 
   return (
-    <div className={styles.gameOverWrap}>
+    <div className={styles.gameOverWrap} onClick={onInteract}>
       {showPicker && (
         <SaveSlotPicker
           mode="load"
@@ -110,16 +110,16 @@ export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, on
 }
 
 // ── Victory ───────────────────────────────────────────────────────────────────
-export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory }) {
+export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory, onInteract }) {
   const [showPicker, setShowPicker] = useState(false);
 
   // All paths clear the winning save first
-  const handleNewGame = () => { onClearVictory(); };
+  const handleNewGame   = () => { onClearVictory(); };
   const handleLoadOther = (slot) => { onEraseSlot(activeSlot); setShowPicker(false); onLoadSlot(slot); };
-  const handleTitle = () => { onClearVictory(); };
+  const handleTitle     = () => { onClearVictory(); };
 
   return (
-    <div className={styles.victoryWrap}>
+    <div className={styles.victoryWrap} onClick={onInteract}>
       {showPicker && (
         <SaveSlotPicker
           mode="load"

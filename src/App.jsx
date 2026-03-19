@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useGameState, getAllSlots } from './useGameState';
 import { useAudio } from './useAudio';
 import HUD from './HUD';
@@ -30,17 +30,24 @@ export default function App() {
 
   const filledSlots = getAllSlots().filter(s => !s.empty).length;
 
-  // ── Music per screen ───────────────────────────────────────────────────────
+  // ── Music per screen & modal ────────────────────────────────────────────────
   useEffect(() => {
-    if (screen === 'title')    playMusic('title');
-    if (screen === 'explore')  playMusic('explore');
-    if (screen === 'gameover') playMusic('title');
-    if (screen === 'victory')  playMusic('title');
+    if (screen === 'title')    { playMusic('title');    return; }
+    if (screen === 'gameover') { playMusic('gameover'); return; }
+    if (screen === 'victory')  { playMusic('victory');  return; }
+    if (screen === 'explore')  { playMusic('explore');  return; }
     if (screen === 'battle') {
-      const isBoss = battleState?.enemy?.isBoss;
-      playMusic(isBoss ? 'boss' : 'battle');
+      playMusic(battleState?.enemy?.isBoss ? 'boss' : 'battle');
+      return;
     }
   }, [screen, battleState?.enemy?.isBoss]);
+
+  // Shop modal overrides to shop music, restores on close
+  useEffect(() => {
+    if (showShop) { playMusic('shop'); return; }
+    if (screen === 'title')   playMusic('title');
+    if (screen === 'explore') playMusic('explore');
+  }, [showShop]);
 
   // ── Sound effects ──────────────────────────────────────────────────────────
   // Intercept game actions and inject sounds
@@ -87,12 +94,16 @@ export default function App() {
   const handleEnemyTurn = () => { playSfx('hit'); enemyAttack(); };
 
   // ── Screens ────────────────────────────────────────────────────────────────
+  // onInteract boots the AudioContext on first user click anywhere on the page
+  const handleInteract = useCallback(() => { playSfx('menuClick'); }, [playSfx]);
+
   if (screen === 'title') return (
     <>
       <TitleScreen
         hasAnySave={filledSlots || null}
         onContinue={() => { playSfx('menuClick'); setSlotPicker('load'); }}
         onNewGame={() =>   { playSfx('menuClick'); setSlotPicker('new'); }}
+        onInteract={handleInteract}
       />
       {slotPicker && (
         <SaveSlotPicker
@@ -112,6 +123,7 @@ export default function App() {
       onLoadSlot={(slot) => { loadSlot(slot); }}
       onEraseSlot={eraseSlot}
       onGoTitle={goToTitle}
+      onInteract={handleInteract}
     />
   );
 
@@ -123,6 +135,7 @@ export default function App() {
       onLoadSlot={(slot) => { loadSlot(slot); }}
       onEraseSlot={eraseSlot}
       onClearVictory={clearVictoryAndGoTitle}
+      onInteract={handleInteract}
     />
   );
 

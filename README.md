@@ -49,16 +49,19 @@ A dark fantasy action/adventure browser RPG built with **React + Vite**. No exte
 
 ## 🎵 Audio System
 
-All audio is procedurally generated via the **Web Audio API** — no audio files needed.
+All audio is procedurally generated via the **Web Audio API** — no audio files needed. Music starts on first user interaction and crossfades smoothly between screens.
 
 ### Music tracks
 
 | Track | Plays during |
 |-------|-------------|
-| Title | Title, Game Over, Victory screens |
+| Title | Title screen |
 | Explore | World exploration |
 | Battle | Regular enemy combat |
 | Boss | Shadow King encounter |
+| Game Over | Death screen |
+| Victory | Victory screen |
+| Shop | Shop modal |
 
 ### Sound effects
 
