@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useGameState, getAllSlots } from './useGameState';
 import { useAudio } from './useAudio';
 import HUD from './HUD';
@@ -189,6 +190,7 @@ export default function App() {
           onClose={() => setShowAudio(false)}
         />
       )}
+      <SpeedInsights />
     </div>
   );
 }
