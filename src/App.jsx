@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useGameState, getAllSlots } from './useGameState';
 import { useAudio } from './useAudio';
 import HUD from './HUD';
@@ -191,6 +192,7 @@ export default function App() {
         />
       )}
       <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
