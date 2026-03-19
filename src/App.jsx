@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameState, getAllSlots } from './useGameState';
 import { useAudio } from './useAudio';
 import HUD from './HUD';
@@ -94,16 +94,12 @@ export default function App() {
   const handleEnemyTurn = () => { playSfx('hit'); enemyAttack(); };
 
   // ── Screens ────────────────────────────────────────────────────────────────
-  // onInteract boots the AudioContext on first user click anywhere on the page
-  const handleInteract = useCallback(() => { playSfx('menuClick'); }, [playSfx]);
-
   if (screen === 'title') return (
     <>
       <TitleScreen
         hasAnySave={filledSlots || null}
         onContinue={() => { playSfx('menuClick'); setSlotPicker('load'); }}
         onNewGame={() =>   { playSfx('menuClick'); setSlotPicker('new'); }}
-        onInteract={handleInteract}
       />
       {slotPicker && (
         <SaveSlotPicker
@@ -123,7 +119,6 @@ export default function App() {
       onLoadSlot={(slot) => { loadSlot(slot); }}
       onEraseSlot={eraseSlot}
       onGoTitle={goToTitle}
-      onInteract={handleInteract}
     />
   );
 
@@ -135,7 +130,6 @@ export default function App() {
       onLoadSlot={(slot) => { loadSlot(slot); }}
       onEraseSlot={eraseSlot}
       onClearVictory={clearVictoryAndGoTitle}
-      onInteract={handleInteract}
     />
   );
 

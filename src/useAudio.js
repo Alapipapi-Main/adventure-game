@@ -234,9 +234,10 @@ const MUSIC_VOL_KEY = 'vorhaan_music_vol';
 const SFX_VOL_KEY   = 'vorhaan_sfx_vol';
 
 export function useAudio() {
-  const ctxRef   = useRef(null);
-  const musicRef = useRef(null);
-  const pendingTrack = useRef(null); // track requested before AudioContext existed
+  const ctxRef       = useRef(null);
+  const musicRef     = useRef(null);
+  const pendingTrack = useRef(null);
+  const unlockedRef  = useRef(false);
 
   const [musicVol, setMusicVolState] = useState(() =>
     parseFloat(localStorage.getItem(MUSIC_VOL_KEY) ?? '0.5')
@@ -245,26 +246,49 @@ export function useAudio() {
     parseFloat(localStorage.getItem(SFX_VOL_KEY) ?? '0.7')
   );
 
-  // Lazily create AudioContext on first user gesture, then flush pending track
+  // Boot the AudioContext and flush pending track
+  const unlock = useCallback(() => {
+    if (unlockedRef.current) return;
+    unlockedRef.current = true;
+
+    const ctx = createCtx();
+    if (!ctx) return;
+    ctxRef.current = ctx;
+
+    const player = new MusicPlayer(ctx);
+    const vol = parseFloat(localStorage.getItem(MUSIC_VOL_KEY) ?? '0.5');
+    player.volume = vol;
+    musicRef.current = player;
+
+    // Play whatever track was queued when the screen first rendered
+    if (pendingTrack.current) {
+      player.play(pendingTrack.current);
+      pendingTrack.current = null;
+    }
+  }, []);
+
+  // Attach a one-time listener to the document for ANY user gesture —
+  // click, keydown, or touchstart — so music starts as early as possible
+  useEffect(() => {
+    const events = ['click', 'keydown', 'touchstart'];
+    const handler = () => {
+      unlock();
+      // Also resume if browser suspended it (tab switch etc.)
+      if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
+      events.forEach(e => document.removeEventListener(e, handler));
+    };
+    events.forEach(e => document.addEventListener(e, handler, { once: true }));
+    return () => events.forEach(e => document.removeEventListener(e, handler));
+  }, [unlock]);
+
   const ensureCtx = useCallback(() => {
     if (ctxRef.current) {
       if (ctxRef.current.state === 'suspended') ctxRef.current.resume();
       return ctxRef.current;
     }
-    const ctx = createCtx();
-    if (!ctx) return null;
-    ctxRef.current = ctx;
-    const player = new MusicPlayer(ctx);
-    const vol = parseFloat(localStorage.getItem(MUSIC_VOL_KEY) ?? '0.5');
-    player.volume = vol;
-    musicRef.current = player;
-    // Flush any track that was requested before the context existed
-    if (pendingTrack.current) {
-      player.play(pendingTrack.current);
-      pendingTrack.current = null;
-    }
-    return ctx;
-  }, []);
+    unlock();
+    return ctxRef.current;
+  }, [unlock]);
 
   const setMusicVol = useCallback((v) => {
     setMusicVolState(v);
@@ -277,16 +301,15 @@ export function useAudio() {
     localStorage.setItem(SFX_VOL_KEY, String(v));
   }, []);
 
-  // playMusic — works even before the first gesture by queuing the track
+  // Queue the track if audio isn't unlocked yet; play immediately if it is
   const playMusic = useCallback((trackName) => {
-    if (!ctxRef.current) {
-      // Queue it — will be picked up on the next ensureCtx() call (first click)
+    if (!unlockedRef.current) {
       pendingTrack.current = trackName;
       return;
     }
-    ensureCtx();
+    if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
     musicRef.current?.crossfadeTo(trackName);
-  }, [ensureCtx]);
+  }, []);
 
   const stopMusic = useCallback(() => {
     musicRef.current?.stop();

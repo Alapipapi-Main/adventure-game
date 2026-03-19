@@ -4,9 +4,11 @@ import SaveSlotPicker from './SaveSlotPicker';
 import styles from './SpecialScreens.module.css';
 
 // ── Title ────────────────────────────────────────────────────────────────────
-export function TitleScreen({ onNewGame, onContinue, hasAnySave, onInteract }) {
+export function TitleScreen({ onNewGame, onContinue, hasAnySave }) {
+  const [audioStarted, setAudioStarted] = useState(false);
+
   return (
-    <div className={styles.titleWrap} onClick={onInteract}>
+    <div className={styles.titleWrap} onClick={() => setAudioStarted(true)}>
       <div className={styles.stars} aria-hidden>
         {Array.from({ length: 50 }).map((_, i) => (
           <div key={i} className={styles.star} style={{
@@ -49,20 +51,24 @@ export function TitleScreen({ onNewGame, onContinue, hasAnySave, onInteract }) {
         {hasAnySave && (
           <p className={styles.saveNote}>💾 {hasAnySave} save slot{hasAnySave > 1 ? 's' : ''} found</p>
         )}
+
+        <p className={`${styles.audioHint} ${audioStarted ? styles.audioHintHidden : ''}`}>
+          🔊 Click anywhere to start music
+        </p>
       </div>
     </div>
   );
 }
 
 // ── Game Over ─────────────────────────────────────────────────────────────────
-export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, onGoTitle, onInteract }) {
+export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, onGoTitle }) {
   const [showPicker, setShowPicker] = useState(false);
   const slots       = getAllSlots();
   const otherSlots  = slots.filter(s => !s.empty && s.slot !== activeSlot);
   const hasOthers   = otherSlots.length > 0;
 
   return (
-    <div className={styles.gameOverWrap} onClick={onInteract}>
+    <div className={styles.gameOverWrap}>
       {showPicker && (
         <SaveSlotPicker
           mode="load"
@@ -110,16 +116,15 @@ export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, on
 }
 
 // ── Victory ───────────────────────────────────────────────────────────────────
-export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory, onInteract }) {
+export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory }) {
   const [showPicker, setShowPicker] = useState(false);
 
-  // All paths clear the winning save first
   const handleNewGame   = () => { onClearVictory(); };
   const handleLoadOther = (slot) => { onEraseSlot(activeSlot); setShowPicker(false); onLoadSlot(slot); };
   const handleTitle     = () => { onClearVictory(); };
 
   return (
-    <div className={styles.victoryWrap} onClick={onInteract}>
+    <div className={styles.victoryWrap}>
       {showPicker && (
         <SaveSlotPicker
           mode="load"
