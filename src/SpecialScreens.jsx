@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getAllSlots } from './useGameState';
+import { getAllSlots, deleteSlot } from './useGameState';
 import SaveSlotPicker from './SaveSlotPicker';
 import styles from './SpecialScreens.module.css';
 
@@ -130,7 +130,10 @@ export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEra
   };
 
   const openPicker = () => {
-    onEraseSlot(activeSlot);
+    // Delete the winning slot from localStorage directly — do NOT call onEraseSlot
+    // which would reset React state and navigate to title before the picker renders
+    deleteSlot(activeSlot);
+    try { localStorage.removeItem('vorhaan_pending_victory_slot'); } catch {}
     setShowPicker(true);
   };
 
