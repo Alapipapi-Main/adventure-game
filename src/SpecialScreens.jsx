@@ -119,12 +119,15 @@ export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, on
 export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory }) {
   const [showPicker, setShowPicker] = useState(false);
 
-  // Any slot other than the just-won one is available (occupied or empty)
-  const otherSlots = getAllSlots().filter(s => s.slot !== activeSlot);
+  // Only count slots that already have save data (excluding the winning slot)
+  const otherSlots = getAllSlots().filter(s => !s.empty && s.slot !== activeSlot);
   const hasOtherSlots = otherSlots.length > 0;
 
   const handleNewGame   = () => { onClearVictory(); };
-  const handleLoadOther = (slot) => { setShowPicker(false); onLoadSlot(slot); };
+  const handleLoadOther = (slot) => {
+    setShowPicker(false);
+    onLoadSlot(slot); // App.jsx handles new-game setup if slot is empty via newGameSlot state
+  };
 
   const openPicker = () => {
     onEraseSlot(activeSlot);
@@ -135,7 +138,7 @@ export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEra
     <div className={styles.victoryWrap}>
       {showPicker && (
         <SaveSlotPicker
-          mode="new"
+          mode="load"
           onSelect={handleLoadOther}
           onErase={(slot) => { onEraseSlot(slot); }}
           onClose={() => setShowPicker(false)}
@@ -177,8 +180,8 @@ export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEra
             📂 Load Another Save
             <span className={styles.btnSub}>
               {hasOtherSlots
-                ? `${otherSlots.length} slot${otherSlots.length > 1 ? 's' : ''} available`
-                : 'No other slots available'}
+                ? `${otherSlots.length} save${otherSlots.length > 1 ? 's' : ''} available`
+                : 'No other saves found'}
             </span>
           </button>
         </div>

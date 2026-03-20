@@ -8,6 +8,19 @@ import {
 
 const SLOT_COUNT = 3;
 const SLOT_KEY = (slot) => `vorhaan_save_v1_slot${slot}`;
+const PENDING_VICTORY_KEY = 'vorhaan_pending_victory_slot';
+
+// Called at boot — if the app was refreshed mid-victory, clean up the winning slot
+function clearPendingVictory() {
+  try {
+    const slot = localStorage.getItem(PENDING_VICTORY_KEY);
+    if (slot) {
+      localStorage.removeItem(SLOT_KEY(parseInt(slot)));
+      localStorage.removeItem(PENDING_VICTORY_KEY);
+    }
+  } catch {}
+}
+clearPendingVictory(); // runs once when the module is first imported
 
 // ── Slot helpers (exported for UI use) ───────────────────────────────────────
 export function readSlot(slot) {
@@ -101,6 +114,7 @@ export function useGameState() {
   const eraseSlot = useCallback((slot) => {
     deleteSlot(slot);
     if (activeSlot === slot) {
+      try { localStorage.removeItem(PENDING_VICTORY_KEY); } catch {}
       setActiveSlot(null);
       setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
       setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
@@ -114,6 +128,7 @@ export function useGameState() {
   // Called after beating the game — wipes the winning slot then goes to title
   const clearVictoryAndGoTitle = useCallback(() => {
     if (activeSlot) deleteSlot(activeSlot);
+    try { localStorage.removeItem(PENDING_VICTORY_KEY); } catch {}
     setActiveSlot(null);
     setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
     setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
@@ -351,7 +366,11 @@ export function useGameState() {
       return applyXp(withRewards, enemy.xp);
     });
     setBattleState(null);
-    if (enemy.id === 'shadow_king') setTimeout(() => setScreen('victory'), 500);
+    if (enemy.id === 'shadow_king') {
+      // Mark slot as pending deletion in case player refreshes on victory screen
+      try { localStorage.setItem(PENDING_VICTORY_KEY, String(activeSlot)); } catch {}
+      setTimeout(() => setScreen('victory'), 500);
+    }
     else setTimeout(() => setScreen('explore'), 300);
   }, [battleState, addLog, advanceQuests, applyXp]);
 
