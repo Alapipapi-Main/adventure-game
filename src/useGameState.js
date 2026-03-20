@@ -96,7 +96,13 @@ export function useGameState() {
       const p = data.player;
       const restoredPlayer = p.hp <= 0 ? { ...p, hp: p.maxHp } : p;
       setPlayer(restoredPlayer);
-      setQuests(data.quests ?? JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+      // Merge any quests added after this save was created so they aren't missing
+      const savedQuests = data.quests ?? [];
+      const mergedQuests = JSON.parse(JSON.stringify(INITIAL_QUESTS)).map(fresh => {
+        const saved = savedQuests.find(q => q.id === fresh.id);
+        return saved ?? fresh;
+      });
+      setQuests(mergedQuests);
       setDifficulty(data.difficulty ?? 'normal');
       setLog(data.log ?? []);
     } else {
