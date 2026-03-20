@@ -11,7 +11,7 @@
   flex-wrap: wrap;
 }
 
-.left { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.left { display: flex; align-items: center; gap: 8px; min-width: 120px; flex-wrap: wrap; }
 
 .name {
   font-family: 'Cinzel', serif;
@@ -29,6 +29,19 @@
   padding: 2px 8px;
   border-radius: 12px;
 }
+
+.diffBadge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid;
+  letter-spacing: 0.05em;
+}
+
+.diff_easy   { color: #2ecc71; border-color: rgba(46,204,113,0.4); background: rgba(46,204,113,0.08); }
+.diff_normal { color: var(--gold); border-color: var(--border); background: rgba(201,168,76,0.08); }
+.diff_hard   { color: #e74c3c; border-color: rgba(231,76,60,0.4); background: rgba(231,76,60,0.08); }
 
 .bars {
   flex: 1;
@@ -97,12 +110,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-
-.invBtn:hover {
-  background: rgba(201,168,76,0.2);
-  border-color: var(--gold);
-  color: var(--gold-light);
-}
+.invBtn:hover { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold-light); }
 
 .questHudBtn {
   position: relative;
@@ -116,6 +124,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
+.questHudBtn:hover { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold-light); }
 
 .audioBtn {
   background: rgba(201,168,76,0.08);

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { BOSS_PATTERNS, BOSS_ATTACKS } from './gameData';
 import styles from './BattleScreen.module.css';
 
 function FloatingNumber({ value, isCrit, target, id }) {
@@ -18,7 +19,9 @@ export default function BattleScreen({
   const [floats, setFloats] = useState([]);
   const [enemyShake, setEnemyShake] = useState(false);
   const [playerShake, setPlayerShake] = useState(false);
-  const [screenFlash, setScreenFlash] = useState(null); // 'hit' | 'crit' | null
+  const [enemyGlow, setEnemyGlow] = useState(false);
+  const [playerGlow, setPlayerGlow] = useState(false);
+  const [screenFlash, setScreenFlash] = useState(null);
   const prevDmg = useRef(null);
 
   // Trigger animations when lastDmg changes
@@ -28,21 +31,22 @@ export default function BattleScreen({
     if (prevDmg.current === id) return;
     prevDmg.current = id;
 
-    // Floating number
     const floatId = Date.now() + Math.random();
     setFloats(prev => [...prev, { value, isCrit, target, id: floatId }]);
     setTimeout(() => setFloats(prev => prev.filter(f => f.id !== floatId)), 900);
 
-    // Sprite shake
     if (target === 'enemy') {
       setEnemyShake(true);
+      setEnemyGlow(true);
       setTimeout(() => setEnemyShake(false), 400);
+      setTimeout(() => setEnemyGlow(false), 350);
     } else {
       setPlayerShake(true);
+      setPlayerGlow(true);
       setTimeout(() => setPlayerShake(false), 400);
+      setTimeout(() => setPlayerGlow(false), 350);
     }
 
-    // Screen flash
     setScreenFlash(isCrit ? 'crit' : target === 'player' ? 'hit' : null);
     setTimeout(() => setScreenFlash(null), 300);
   }, [battleState?.lastDmg?.id]);
@@ -69,10 +73,28 @@ export default function BattleScreen({
 
   const hpColor = pct => pct > 60 ? 'var(--hp-green)' : pct > 30 ? 'var(--hp-yellow)' : 'var(--hp-red)';
 
+  // Boss phase & next attack preview
+  const bossPhase = battleState.bossPhase ?? 1;
+  const bossPatternIdx = battleState.bossPatternIdx ?? 0;
+  const nextAttackId = enemy.isBoss
+    ? BOSS_PATTERNS[bossPhase === 2 ? 'phase2' : 'phase1'][bossPatternIdx % BOSS_PATTERNS[bossPhase === 2 ? 'phase2' : 'phase1'].length]
+    : null;
+  const nextAttack = nextAttackId ? BOSS_ATTACKS[nextAttackId] : null;
+
   return (
     <div className={`${styles.wrap} ${screenFlash === 'hit' ? styles.flashHit : ''} ${screenFlash === 'crit' ? styles.flashCrit : ''}`}>
       {enemy.isBoss && (
-        <div className={styles.bossAlert}>⚠️ BOSS ENCOUNTER — {enemy.name}</div>
+        <div className={styles.bossAlert}>
+          <span>👑 BOSS — {enemy.name}</span>
+          <span className={`${styles.bossPhase} ${bossPhase === 2 ? styles.phase2 : ''}`}>
+            {bossPhase === 1 ? 'Phase 1' : '⚠️ Phase 2'}
+          </span>
+          {nextAttack && isPlayerTurn && (
+            <span className={styles.nextAttack}>
+              Next: <strong>{nextAttack.name}</strong>
+            </span>
+          )}
+        </div>
       )}
 
       <div className={styles.arena}>
@@ -82,7 +104,7 @@ export default function BattleScreen({
             {floats.filter(f => f.target === 'enemy').map(f => (
               <FloatingNumber key={f.id} {...f} />
             ))}
-            <div className={`${styles.sprite} ${enemyShake ? styles.shake : ''} ${(battleState.turn === 'enemy' || battleState.turn === 'enemy_defend') ? styles.attacking : ''}`}>
+            <div className={`${styles.sprite} ${enemyShake ? styles.shake : ''} ${enemyGlow ? styles.hitGlow : ''} ${(battleState.turn === 'enemy' || battleState.turn === 'enemy_defend') ? styles.attacking : ''}`}>
               {enemy.icon}
             </div>
           </div>
@@ -102,7 +124,7 @@ export default function BattleScreen({
             {floats.filter(f => f.target === 'player').map(f => (
               <FloatingNumber key={f.id} {...f} />
             ))}
-            <div className={`${styles.sprite} ${playerShake ? styles.shake : ''}`}>🧙</div>
+            <div className={`${styles.sprite} ${playerShake ? styles.shake : ''} ${playerGlow ? styles.hitGlow : ''}`}>🧙</div>
           </div>
           <div className={styles.combatantName}>{player.name}</div>
           <div className={styles.combatantLevel}>Level {player.level}</div>

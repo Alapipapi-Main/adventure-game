@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   ENEMIES, LOCATIONS, WEAPONS, ARMORS,
   INITIAL_PLAYER, INITIAL_QUESTS, QUESTS,
+  DIFFICULTIES, BOSS_PATTERNS, BOSS_ATTACKS,
   getXpToNext, getLevelStats,
 } from './gameData';
 
@@ -38,13 +39,14 @@ export function getAllSlots() {
 
 // ── Hook ─────────────────────────────────────────────────────────────────────
 export function useGameState() {
-  const [activeSlot, setActiveSlot] = useState(null); // null = no slot loaded yet
+  const [activeSlot, setActiveSlot] = useState(null);
   const [player, setPlayer]         = useState(() => JSON.parse(JSON.stringify(INITIAL_PLAYER)));
   const [screen, setScreen]         = useState('title');
   const [battleState, setBattleState] = useState(null);
   const [log, setLog]               = useState([]);
   const [notification, setNotification] = useState(null);
   const [quests, setQuests]         = useState(() => JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+  const [difficulty, setDifficulty] = useState('normal');
 
   // Track latest values for auto-save without stale closure issues
   const saveRef = useRef({ player, quests, log, screen, activeSlot });
@@ -57,10 +59,11 @@ export function useGameState() {
     writeSlot(activeSlot, {
       player,
       quests,
+      difficulty,
       log: log.slice(-20),
       savedAt: new Date().toISOString(),
     });
-  }, [player, quests, screen, activeSlot]);
+  }, [player, quests, screen, activeSlot, difficulty]);
 
   const addLog = useCallback((msg, type = 'normal') => {
     setLog(prev => [...prev.slice(-40), { msg, type, id: Date.now() + Math.random() }]);
@@ -72,19 +75,23 @@ export function useGameState() {
   }, []);
 
   // ── Slot management ───────────────────────────────────────────────────────
-  const loadSlot = useCallback((slot) => {
+  const loadSlot = useCallback((slot, newGameOpts = null) => {
     const data = readSlot(slot);
     setActiveSlot(slot);
-    if (data) {
-      // Restore HP to max if player died (hp === 0) so retry feels fair
+    if (data && !newGameOpts) {
       const p = data.player;
       const restoredPlayer = p.hp <= 0 ? { ...p, hp: p.maxHp } : p;
       setPlayer(restoredPlayer);
       setQuests(data.quests ?? JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+      setDifficulty(data.difficulty ?? 'normal');
       setLog(data.log ?? []);
     } else {
-      setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
+      // New game — apply name and difficulty from setup
+      const base = JSON.parse(JSON.stringify(INITIAL_PLAYER));
+      if (newGameOpts?.name) base.name = newGameOpts.name;
+      setPlayer(base);
       setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+      setDifficulty(newGameOpts?.difficulty ?? 'normal');
       setLog([]);
     }
     setBattleState(null);
@@ -97,6 +104,7 @@ export function useGameState() {
       setActiveSlot(null);
       setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
       setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+      setDifficulty('normal');
       setLog([]);
       setBattleState(null);
       setScreen('title');
@@ -109,6 +117,7 @@ export function useGameState() {
     setActiveSlot(null);
     setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
     setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
+    setDifficulty('normal');
     setBattleState(null);
     setLog([]);
     setScreen('title');
@@ -154,11 +163,29 @@ export function useGameState() {
 
   // ── Battle ────────────────────────────────────────────────────────────────
   const startBattle = useCallback((enemyId) => {
-    const enemy = JSON.parse(JSON.stringify(ENEMIES[enemyId]));
-    setBattleState({ enemy, turn: 'player', buffs: { atk: 0 }, round: 1, lastDmg: null, lastHit: null });
+    const base = JSON.parse(JSON.stringify(ENEMIES[enemyId]));
+    const diff = DIFFICULTIES[difficulty] ?? DIFFICULTIES.normal;
+    const enemy = {
+      ...base,
+      atk:   Math.round(base.atk   * diff.enemyAtkMult),
+      def:   Math.round(base.def   * diff.enemyDefMult),
+      hp:    Math.round(base.hp    * diff.enemyHpMult),
+      maxHp: Math.round(base.maxHp * diff.enemyHpMult),
+      gold:  Math.round(base.gold  * diff.goldMult),
+      xp:    Math.round(base.xp    * diff.xpMult),
+    };
+    setBattleState({
+      enemy,
+      turn: 'player',
+      buffs: { atk: 0, def: 0 },
+      round: 1,
+      bossPatternIdx: 0,
+      bossPhase: 1,
+      lastDmg: null,
+    });
     setScreen('battle');
     addLog(`⚔️ A ${enemy.name} appears!`, 'danger');
-  }, [addLog]);
+  }, [addLog, difficulty]);
 
   const playerAttack = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
@@ -203,14 +230,76 @@ export function useGameState() {
 
   const enemyAttack = useCallback(() => {
     if (!battleState) return;
+    const { enemy } = battleState;
     const isDefending = battleState.turn === 'enemy_defend';
-    const bonus = isDefending ? (battleState.defendBonus || 0) : 0;
-    const def = player.def + player.armor.def + bonus;
-    const dmg = Math.max(1, battleState.enemy.atk - def + Math.floor(Math.random() * 6) - 2);
-    addLog(`${battleState.enemy.icon} ${battleState.enemy.name} attacks you for ${dmg} damage!`, 'danger');
+    const defBonus = isDefending ? (battleState.defendBonus || 0) : 0;
+
+    // ── Boss pattern logic ──────────────────────────────────────────────────
+    if (enemy.isBoss) {
+      const hpPct  = enemy.hp / enemy.maxHp;
+      const phase  = hpPct > 0.5 ? 'phase1' : 'phase2';
+      const pattern = BOSS_PATTERNS[phase];
+      const patIdx  = battleState.bossPatternIdx ?? 0;
+      const attackId = pattern[patIdx % pattern.length];
+      const attack   = BOSS_ATTACKS[attackId];
+
+      // Phase transition notification
+      if (phase === 'phase2' && battleState.bossPhase === 1) {
+        addLog(`🌑 The Shadow King enters Phase 2 — his power surges!`, 'danger');
+      }
+
+      // Dark Ritual — boss heals, no damage
+      if (attackId === 'dark_heal') {
+        addLog(attack.log(enemy.name), 'danger');
+        setBattleState(prev => ({
+          ...prev,
+          enemy: { ...prev.enemy, hp: Math.min(prev.enemy.maxHp, prev.enemy.hp + attack.heal) },
+          turn: 'player',
+          defendBonus: 0,
+          round: (prev.round || 1) + 1,
+          bossPatternIdx: patIdx + 1,
+          bossPhase: phase === 'phase2' ? 2 : prev.bossPhase,
+          lastDmg: null,
+        }));
+        return;
+      }
+
+      // All other boss attacks deal damage
+      const def = player.def + player.armor.def + defBonus + (battleState.buffs?.def || 0);
+      const rawDmg = Math.max(1, Math.round(enemy.atk * attack.atkMult) - def + Math.floor(Math.random() * 6) - 2);
+      addLog(attack.log(enemy.name), 'danger');
+
+      // Void Curse debuffs player DEF
+      const newBufDef = attackId === 'curse'
+        ? (battleState.buffs?.def || 0) + (attack.debuff?.def || 0)
+        : (battleState.buffs?.def || 0);
+
+      if (attackId === 'curse') addLog(`🌑 Your DEF is reduced by ${Math.abs(attack.debuff.def)}!`, 'danger');
+
+      setPlayer(p => ({ ...p, hp: Math.max(0, p.hp - rawDmg) }));
+      setBattleState(prev => ({
+        ...prev,
+        turn: 'player',
+        defendBonus: 0,
+        round: (prev.round || 1) + 1,
+        bossPatternIdx: patIdx + 1,
+        bossPhase: phase === 'phase2' ? 2 : prev.bossPhase,
+        buffs: { ...prev.buffs, def: newBufDef },
+        lastDmg: { value: rawDmg, isCrit: attackId === 'charge', target: 'player', id: Date.now() },
+      }));
+      return;
+    }
+
+    // ── Normal enemy attack ─────────────────────────────────────────────────
+    const def = player.def + player.armor.def + defBonus + (battleState.buffs?.def || 0);
+    const dmg = Math.max(1, enemy.atk - def + Math.floor(Math.random() * 6) - 2);
+    addLog(`${enemy.icon} ${enemy.name} attacks you for ${dmg} damage!`, 'danger');
     setPlayer(p => ({ ...p, hp: Math.max(0, p.hp - dmg) }));
     setBattleState(prev => ({
-      ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1,
+      ...prev,
+      turn: 'player',
+      defendBonus: 0,
+      round: (prev.round || 1) + 1,
       lastDmg: { value: dmg, isCrit: false, target: 'player', id: Date.now() },
     }));
   }, [battleState, player, addLog]);
@@ -270,7 +359,7 @@ export function useGameState() {
   }, []);
 
   return {
-    player, screen, setScreen, battleState, log, notification, quests, activeSlot,
+    player, screen, setScreen, battleState, log, notification, quests, activeSlot, difficulty,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
     resolveVictory, useItem, buyItem, rest, claimQuest, addLog, notify,
     loadSlot, eraseSlot, goToTitle, clearVictoryAndGoTitle,

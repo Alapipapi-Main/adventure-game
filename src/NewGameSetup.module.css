@@ -1,0 +1,172 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  padding: 20px;
+}
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.9);
+  overflow: hidden;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--bg-mid), var(--bg-card));
+}
+
+.title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1rem;
+  color: var(--gold-light);
+}
+
+.closeBtn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+.closeBtn:hover { background: rgba(255,255,255,0.1); color: var(--text-bright); }
+
+.body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.section { display: flex; flex-direction: column; gap: 8px; }
+
+.label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.nameInput {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: var(--text-bright);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.nameInput::placeholder { color: var(--text-muted); opacity: 0.5; font-style: italic; }
+.nameInput:focus { border-color: var(--gold); }
+
+.inputError { border-color: #e74c3c !important; }
+
+.errorText {
+  font-size: 0.72rem;
+  color: #e74c3c;
+  margin-top: 2px;
+}
+
+.difficulties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diffBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  color: var(--text-bright);
+  position: relative;
+}
+
+.diffBtn:hover {
+  border-color: var(--border);
+  background: rgba(255,255,255,0.05);
+  transform: translateX(3px);
+}
+
+.diffSelected {
+  border-color: var(--gold) !important;
+  background: rgba(201,168,76,0.08) !important;
+}
+
+.diffIcon { font-size: 1.4rem; flex-shrink: 0; }
+
+.diffInfo { flex: 1; }
+
+.diffLabel {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 2px;
+}
+
+.diffDesc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.diffCheck {
+  position: absolute;
+  right: 14px;
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.startBtn {
+  background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(201,168,76,0.05));
+  border: 1px solid var(--gold);
+  color: var(--gold-light);
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.95rem;
+  padding: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s;
+  width: 100%;
+  letter-spacing: 0.04em;
+}
+
+.startBtn:hover {
+  background: linear-gradient(135deg, rgba(201,168,76,0.4), rgba(201,168,76,0.12));
+  box-shadow: 0 0 24px rgba(201,168,76,0.25);
+  transform: translateY(-2px);
+}

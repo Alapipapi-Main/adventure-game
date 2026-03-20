@@ -5,14 +5,49 @@ A dark fantasy action/adventure browser RPG built with **React + Vite**. No exte
 ## 🎮 Gameplay
 
 - **Explore** 6 unique locations across a cursed land
-- **Battle** 10 enemy types in turn-based combat, including a final boss
+- **Battle** 10 enemy types in turn-based combat, including a final boss with multiple attack phases
 - **Level up** — gain XP to grow HP, ATK, and DEF automatically
 - **Equip** weapons and armor from the shop (5 tiers each)
 - **Use items** like potions and elixirs in and out of battle
-- **Defend** to halve incoming damage on the next hit
+- **Defend** to reduce incoming damage on the next hit
 - **Flee** from battles (60% success rate)
 - **Complete quests** from the Tavern notice board for bonus gold and XP
 - **Save progress** across 3 independent save slots with auto-save
+
+## 🎭 Character Setup
+
+When starting a new game, you choose:
+
+- **Hero Name** — personalise your character (up to 20 characters)
+- **Difficulty** — affects all enemy stats and rewards for the entire run
+
+| Difficulty | Enemy ATK | Enemy DEF | Enemy HP | Gold | XP |
+|-----------|-----------|-----------|----------|------|----|
+| 🌿 Easy   | ×0.7      | ×0.7      | ×0.8     | ×1.2 | ×1.0 |
+| ⚔️ Normal | ×1.0      | ×1.0      | ×1.0     | ×1.0 | ×1.0 |
+| 💀 Hard   | ×1.35     | ×1.25     | ×1.35    | ×1.5 | ×1.25 |
+
+Your chosen difficulty is shown as a badge in the HUD throughout the run.
+
+## 👑 Shadow King Boss Patterns
+
+The final boss has two phases with distinct attack rotations:
+
+**Phase 1** (HP > 50%)
+| Attack | Effect |
+|--------|--------|
+| Shadow Strike | Standard damage |
+| Dark Charge | 1.6× damage burst |
+| Void Curse | 0.8× damage + reduces your DEF by 5 |
+
+**Phase 2** (HP ≤ 50%) — more aggressive
+| Attack | Effect |
+|--------|--------|
+| Dark Charge | 1.6× damage burst (more frequent) |
+| Void Curse | DEF reduction (more frequent) |
+| Dark Ritual | Boss heals 40 HP |
+
+The next attack is previewed in the battle UI so you can plan your defence.
 
 ## 🗺️ Locations
 
@@ -97,16 +132,17 @@ src/
 ├── App.css                # Global styles + toast notifications
 ├── index.css              # CSS variables & resets
 ├── main.jsx               # Entry point
-├── gameData.js            # Locations, enemies, weapons, armor, quests
-├── useGameState.js        # All game logic (battle, quests, save slots)
+├── gameData.js            # Locations, enemies, weapons, armor, quests, difficulty, boss patterns
+├── useGameState.js        # All game logic (battle, quests, save slots, difficulty)
 ├── useAudio.js            # Procedural music & SFX via Web Audio API
-├── HUD.jsx                # Sticky stats bar (HP, XP, gold, buttons)
+├── HUD.jsx                # Sticky stats bar (HP, XP, gold, difficulty badge, buttons)
 ├── ExploreScreen.jsx      # World navigation & action panel
-├── BattleScreen.jsx       # Turn-based combat with animations
+├── BattleScreen.jsx       # Turn-based combat with animations & boss phase display
 ├── ShopScreen.jsx         # Buy weapons, armor & consumables
 ├── InventoryModal.jsx     # View & use carried items
 ├── QuestBoard.jsx         # Quest list with progress & claim rewards
 ├── SaveSlotPicker.jsx     # 3-slot save/load picker modal
+├── NewGameSetup.jsx       # Character name & difficulty selection
 ├── AudioSettings.jsx      # Music & SFX volume sliders
 └── SpecialScreens.jsx     # Title, Game Over, Victory screens
 ```

@@ -210,3 +210,25 @@ export function getLevelStats(level) {
     def: 5 + (level - 1) * 2,
   };
 }
+
+// ── Difficulty settings ───────────────────────────────────────────────────────
+export const DIFFICULTIES = {
+  easy:   { id: 'easy',   label: 'Easy',   icon: '🌿', enemyAtkMult: 0.7,  enemyDefMult: 0.7,  enemyHpMult: 0.8,  goldMult: 1.2, xpMult: 1.0, description: 'Enemies deal less damage and have less HP' },
+  normal: { id: 'normal', label: 'Normal', icon: '⚔️', enemyAtkMult: 1.0,  enemyDefMult: 1.0,  enemyHpMult: 1.0,  goldMult: 1.0, xpMult: 1.0, description: 'The intended experience' },
+  hard:   { id: 'hard',   label: 'Hard',   icon: '💀', enemyAtkMult: 1.35, enemyDefMult: 1.25, enemyHpMult: 1.35, goldMult: 1.5, xpMult: 1.25, description: 'Tougher enemies, but greater rewards' },
+};
+
+// ── Boss attack patterns (Shadow King) ───────────────────────────────────────
+export const BOSS_PATTERNS = {
+  // Phase 1 (HP > 50%): normal rotation
+  phase1: ['strike', 'strike', 'charge', 'strike', 'curse', 'strike', 'charge', 'strike'],
+  // Phase 2 (HP <= 50%): more aggressive, adds dark_heal
+  phase2: ['charge', 'strike', 'curse', 'charge', 'strike', 'dark_heal', 'charge', 'curse'],
+};
+
+export const BOSS_ATTACKS = {
+  strike:    { name: 'Shadow Strike',  atkMult: 1.0,  log: (name) => `👑 ${name} strikes with a shadow blade!` },
+  charge:    { name: 'Dark Charge',    atkMult: 1.6,  log: (name) => `💥 ${name} charges up and unleashes Dark Charge!` },
+  curse:     { name: 'Void Curse',     atkMult: 0.8,  debuff: { def: -5 }, log: (name) => `🌑 ${name} casts Void Curse — your defences weaken!` },
+  dark_heal: { name: 'Dark Ritual',    atkMult: 0.0,  heal: 40, log: (name) => `🩸 ${name} performs a Dark Ritual — restoring 40 HP!` },
+};

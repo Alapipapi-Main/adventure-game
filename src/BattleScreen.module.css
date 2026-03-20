@@ -24,17 +24,46 @@
 }
 
 .bossAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(201,168,76,0.1));
   border: 1px solid var(--gold);
   border-radius: 8px;
-  padding: 12px 20px;
-  text-align: center;
+  padding: 10px 16px;
   font-family: 'Cinzel', serif;
-  font-size: 1rem;
+  font-size: 0.82rem;
   color: var(--gold-light);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.06em;
   animation: pulse 2s infinite;
 }
+
+.bossPhase {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.phase2 {
+  background: rgba(139,0,0,0.25);
+  border-color: var(--blood-light);
+  color: #ffaaaa;
+  animation: pulse 1.2s infinite;
+}
+
+.nextAttack {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.nextAttack strong { color: var(--gold); }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -89,6 +118,17 @@
   line-height: 1;
   display: block;
   user-select: none;
+  transition: filter 0.1s;
+}
+
+/* Red glow flash when a sprite takes a hit */
+.hitGlow {
+  animation: hitGlowAnim 0.35s ease-out;
+}
+@keyframes hitGlowAnim {
+  0%   { filter: drop-shadow(0 0 20px rgba(201,168,76,0.3)); }
+  30%  { filter: drop-shadow(0 0 28px rgba(255,60,60,0.9)) brightness(1.5); }
+  100% { filter: drop-shadow(0 0 20px rgba(201,168,76,0.3)); }
 }
 
 /* Damage taken shake */
@@ -101,11 +141,11 @@
   80%      { transform: translateX(6px); }
 }
 
-/* Enemy "lunge" on their turn */
+/* Enemy "lunge" on their turn — lunges toward player (left/center) */
 .attacking { animation: lunge 0.5s ease-in-out; }
 @keyframes lunge {
   0%,100% { transform: translateX(0); }
-  40%     { transform: translateX(18px) scale(1.1); }
+  40%     { transform: translateX(-22px) scale(1.12); }
 }
 
 /* Floating damage numbers */
