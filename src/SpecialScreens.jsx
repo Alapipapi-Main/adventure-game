@@ -119,8 +119,8 @@ export function GameOverScreen({ player, activeSlot, onLoadSlot, onEraseSlot, on
 export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEraseSlot, onClearVictory }) {
   const [showPicker, setShowPicker] = useState(false);
 
-  // Check for other filled slots (excluding the just-won slot which is already cleared)
-  const otherSlots = getAllSlots().filter(s => !s.empty && s.slot !== activeSlot);
+  // Any slot other than the just-won one is available (occupied or empty)
+  const otherSlots = getAllSlots().filter(s => s.slot !== activeSlot);
   const hasOtherSlots = otherSlots.length > 0;
 
   const handleNewGame   = () => { onClearVictory(); };
@@ -135,7 +135,7 @@ export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEra
     <div className={styles.victoryWrap}>
       {showPicker && (
         <SaveSlotPicker
-          mode="load"
+          mode="new"
           onSelect={handleLoadOther}
           onErase={(slot) => { onEraseSlot(slot); }}
           onClose={() => setShowPicker(false)}
@@ -177,8 +177,8 @@ export function VictoryScreen({ player, activeSlot, onNewGame, onLoadSlot, onEra
             📂 Load Another Save
             <span className={styles.btnSub}>
               {hasOtherSlots
-                ? `${otherSlots.length} other slot${otherSlots.length > 1 ? 's' : ''} available`
-                : 'No other saves found — start a new adventure'}
+                ? `${otherSlots.length} slot${otherSlots.length > 1 ? 's' : ''} available`
+                : 'No other slots available'}
             </span>
           </button>
         </div>
