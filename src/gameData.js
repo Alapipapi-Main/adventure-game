@@ -254,7 +254,7 @@ export function getLevelStats(level) {
 
 // ── Difficulty settings ───────────────────────────────────────────────────────
 export const DIFFICULTIES = {
-  easy:   { id: 'easy',   label: 'Easy',   icon: '🌿', enemyAtkMult: 0.7,  enemyDefMult: 0.7,  enemyHpMult: 0.8,  goldMult: 1.2, xpMult: 1.0, description: 'Enemies deal less damage and have less HP' },
+  easy:   { id: 'easy',   label: 'Easy',   icon: '🌿', enemyAtkMult: 0.7,  enemyDefMult: 0.7,  enemyHpMult: 0.8,  goldMult: 0.7, xpMult: 0.75, description: 'Enemies are weaker, but rewards are reduced' },
   normal: { id: 'normal', label: 'Normal', icon: '⚔️', enemyAtkMult: 1.0,  enemyDefMult: 1.0,  enemyHpMult: 1.0,  goldMult: 1.0, xpMult: 1.0, description: 'The intended experience' },
   hard:   { id: 'hard',   label: 'Hard',   icon: '💀', enemyAtkMult: 1.35, enemyDefMult: 1.25, enemyHpMult: 1.35, goldMult: 1.5, xpMult: 1.25, description: 'Tougher enemies, but greater rewards' },
 };
