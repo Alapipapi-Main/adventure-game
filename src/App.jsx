@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useGameState, getAllSlots } from './useGameState';
 import { useAudio } from './useAudio';
 import HUD from './HUD';
@@ -8,14 +10,13 @@ import ShopScreen from './ShopScreen';
 import InventoryModal from './InventoryModal';
 import QuestBoard from './QuestBoard';
 import SaveSlotPicker from './SaveSlotPicker';
-import NewGameSetup from './NewGameSetup';
 import AudioSettings from './AudioSettings';
 import { TitleScreen, GameOverScreen, VictoryScreen } from './SpecialScreens';
 import './App.css';
 
 export default function App() {
   const {
-    player, screen, setScreen, battleState, log, notification, quests, activeSlot, difficulty,
+    player, screen, setScreen, battleState, log, notification, quests, activeSlot,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
     resolveVictory, useItem, buyItem, rest, claimQuest, addLog,
     loadSlot, eraseSlot, goToTitle, clearVictoryAndGoTitle,
@@ -28,7 +29,6 @@ export default function App() {
   const [showQuests,    setShowQuests]    = useState(false);
   const [showAudio,     setShowAudio]     = useState(false);
   const [slotPicker,    setSlotPicker]    = useState(null);
-  const [newGameSlot,   setNewGameSlot]   = useState(null); // slot number awaiting setup
 
   const filledSlots = getAllSlots().filter(s => !s.empty).length;
 
@@ -106,25 +106,9 @@ export default function App() {
       {slotPicker && (
         <SaveSlotPicker
           mode={slotPicker}
-          onSelect={(slot) => {
-            setSlotPicker(null);
-            if (slotPicker === 'new') {
-              setNewGameSlot(slot); // show name/difficulty setup before starting
-            } else {
-              loadSlot(slot);
-            }
-          }}
-          onErase={(slot) => { eraseSlot(slot); setSlotPicker(null); setTimeout(() => setSlotPicker(slotPicker), 50); }}
+          onSelect={(slot) => { setSlotPicker(null); loadSlot(slot); }}
+          onErase={(slot)  => { eraseSlot(slot); setSlotPicker(null); setTimeout(() => setSlotPicker(slotPicker), 50); }}
           onClose={() => setSlotPicker(null)}
-        />
-      )}
-      {newGameSlot && (
-        <NewGameSetup
-          onStart={({ name, difficulty }) => {
-            setNewGameSlot(null);
-            loadSlot(newGameSlot, { name, difficulty });
-          }}
-          onClose={() => setNewGameSlot(null)}
         />
       )}
     </>
@@ -160,7 +144,6 @@ export default function App() {
       <HUD
         player={player}
         quests={quests}
-        difficulty={difficulty}
         musicVol={musicVol}
         sfxVol={sfxVol}
         onInventory={() => setShowInventory(true)}
@@ -208,6 +191,8 @@ export default function App() {
           onClose={() => setShowAudio(false)}
         />
       )}
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }
