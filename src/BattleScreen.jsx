@@ -57,6 +57,11 @@ export default function BattleScreen({
       const t = setTimeout(onEnemyTurn, 900);
       return () => clearTimeout(t);
     }
+    if (battleState.turn === 'player_stunned') {
+      // Auto-skip stunned turn after showing message
+      const t = setTimeout(onEnemyTurn, 1200);
+      return () => clearTimeout(t);
+    }
     if (battleState.turn === 'resolved') {
       const t = setTimeout(onResolveVictory, 700);
       return () => clearTimeout(t);
@@ -69,6 +74,7 @@ export default function BattleScreen({
   const enemyHpPct  = (enemy.hp / enemy.maxHp) * 100;
   const playerHpPct = (player.hp / player.maxHp) * 100;
   const isPlayerTurn = battleState.turn === 'player';
+  const isStunned    = battleState.turn === 'player_stunned';
   // Show unique item types in battle — dedupe by id, max 3 slots
   const battleItems = player.inventory
     .filter(i => i.type === 'consumable')
@@ -172,8 +178,8 @@ export default function BattleScreen({
 
       {/* Actions */}
       <div className={styles.actions}>
-        <div className={styles.turnIndicator}>
-          {isPlayerTurn ? '⚡ Your Turn' : '⏳ Enemy Turn...'}
+        <div className={`${styles.turnIndicator} ${isStunned ? styles.stunned : ''}`}>
+          {isPlayerTurn ? '⚡ Your Turn' : isStunned ? '💫 Stunned — turn skipped!' : '⏳ Enemy Turn...'}
         </div>
         <div className={styles.buttons}>
           <button className={`${styles.btn} ${styles.attackBtn}`} onClick={onAttack} disabled={!isPlayerTurn}>

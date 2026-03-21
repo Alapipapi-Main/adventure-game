@@ -76,10 +76,11 @@ export function useGameState() {
       player,
       quests,
       difficulty,
+      pendingSkillPick: pendingLevelUp,
       log: log.slice(-20),
       savedAt: new Date().toISOString(),
     });
-  }, [player, quests, screen, activeSlot, difficulty]);
+  }, [player, quests, screen, activeSlot, difficulty, pendingLevelUp]);
 
   const addLog = useCallback((msg, type = 'normal') => {
     setLog(prev => [...prev.slice(-40), { msg, type, id: Date.now() + Math.random() }]);
@@ -106,6 +107,7 @@ export function useGameState() {
       });
       setQuests(mergedQuests);
       setDifficulty(data.difficulty ?? 'normal');
+      setPendingLevelUp(data.pendingSkillPick ?? false);
       setLog(data.log ?? []);
     } else {
       // New game — apply name and difficulty from setup
@@ -128,6 +130,7 @@ export function useGameState() {
       setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
       setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
       setDifficulty('normal');
+      setPendingLevelUp(false);
       setLog([]);
       setBattleState(null);
       setScreen('title');
@@ -142,6 +145,7 @@ export function useGameState() {
     setPlayer(JSON.parse(JSON.stringify(INITIAL_PLAYER)));
     setQuests(JSON.parse(JSON.stringify(INITIAL_QUESTS)));
     setDifficulty('normal');
+    setPendingLevelUp(false);
     setBattleState(null);
     setLog([]);
     setScreen('title');
@@ -474,13 +478,14 @@ export function useGameState() {
 
     // Handle stun — skip player turn instead of dealing damage
     if (inflictStatus === 'stun') {
-      addLog(`${enemy.icon} ${enemy.name} stuns you! 💫 You lose your next turn!`, 'danger');
-      setPlayer(p => ({
-        ...p,
-        statusEffects: [...(p.statusEffects || []), { id: 'stun', turnsLeft: 1 }],
-      }));
+      addLog(`${enemy.icon} ${enemy.name} stuns you! 💫 You will lose your next turn!`, 'danger');
+      setPlayer(p => ({ ...p, hp: Math.max(0, p.hp - dmg) }));
       setBattleState(prev => ({
-        ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1, lastDmg: null,
+        ...prev,
+        turn: 'player_stunned', // BattleScreen will auto-skip this turn
+        defendBonus: 0,
+        round: (prev.round || 1) + 1,
+        lastDmg: { value: dmg, isCrit: false, target: 'player', id: Date.now() },
       }));
       return;
     }
@@ -490,11 +495,10 @@ export function useGameState() {
       : '';
     addLog(`${enemy.icon} ${enemy.name} attacks you for ${dmg} damage!${statusMsg}`, 'danger');
 
-    // Tick existing player status effects
+    // Tick existing player status effects (no stun handling here anymore)
     let statusDmg = 0;
     let newStatuses = (player.statusEffects || [])
       .map(s => {
-        if (s.id === 'stun') { addLog(`💫 You are stunned and lose your turn!`, 'danger'); return null; }
         const effect = STATUS_EFFECTS[s.id];
         if (effect?.damage > 0) {
           statusDmg += effect.damage;
@@ -509,13 +513,12 @@ export function useGameState() {
       newStatuses.push({ id: inflictStatus, turnsLeft: STATUS_EFFECTS[inflictStatus].duration });
     }
 
-    const isStunned = (player.statusEffects || []).some(s => s.id === 'stun');
     const totalDmg = dmg + statusDmg;
 
     setPlayer(p => ({ ...p, hp: Math.max(0, p.hp - totalDmg), statusEffects: newStatuses }));
     setBattleState(prev => ({
       ...prev,
-      turn: isStunned ? 'enemy' : 'player', // if stunned, enemy goes again
+      turn: 'player',
       defendBonus: 0,
       round: (prev.round || 1) + 1,
       lastDmg: { value: totalDmg, isCrit: false, target: 'player', id: Date.now() },

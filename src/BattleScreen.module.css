@@ -333,3 +333,8 @@
   font-size: 0.6rem;
   color: var(--text-muted);
 }
+
+.stunned {
+  color: #f1c40f !important;
+  animation: pulse 0.8s ease-in-out infinite;
+}
