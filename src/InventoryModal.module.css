@@ -129,3 +129,21 @@
 
 .stat span:first-child { color: var(--text-muted); font-family: 'Cinzel', serif; font-size: 0.72rem; }
 .stat span:last-child { color: var(--text-bright); font-weight: 600; }
+
+.statMain {
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.statBreak {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  padding: 2px 0 2px 12px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.statBreak span:last-child { color: var(--text-muted); }
+
+.perkBonus { color: #cc88ff !important; }

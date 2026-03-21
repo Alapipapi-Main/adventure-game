@@ -220,7 +220,7 @@ export default function App() {
       </main>
 
       {showShop      && <ShopScreen     player={player} onBuy={handleBuy}                 onClose={() => setShowShop(false)}      />}
-      {showInventory && <InventoryModal player={player} onUse={i => handleUseItem(i,false)} onClose={() => setShowInventory(false)} />}
+      {showInventory && <InventoryModal player={player} difficulty={difficulty} onUse={i => handleUseItem(i,false)} onClose={() => setShowInventory(false)} />}
       {showQuests    && <QuestBoard     quests={quests}  onClaim={claimQuest}              onClose={() => setShowQuests(false)}    />}
       {showAudio     && (
         <AudioSettings
