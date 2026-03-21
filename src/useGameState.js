@@ -199,8 +199,9 @@ export function useGameState() {
       const s = getLevelStats(newLevel);
       newMaxHp = s.maxHp; newAtk = s.atk; newDef = s.def;
       leveledUp = true;
-      // Trigger skill tree every 2 levels
-      if (newLevel % 2 === 0) skillTrigger = true;
+      // Trigger skill tree every 2 levels, starting from level 4
+      // Trigger skill tree at levels 3, 5, 7, 9 (every 2 levels starting from 3)
+      if (newLevel % 2 === 1 && newLevel >= 3) skillTrigger = true;
     }
     if (leveledUp) {
       addLog(`⭐ Level Up! You are now Level ${newLevel}!`, 'levelup');
