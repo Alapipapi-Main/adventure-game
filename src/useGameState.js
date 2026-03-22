@@ -396,12 +396,18 @@ export function useGameState() {
       });
     }
     if (inBattle && item.effect === 'evasion_tonic') {
-      setBattleState(prev => prev ? {
-        ...prev,
-        buffs: { ...prev.buffs, dodgeChance: (prev.buffs?.dodgeChance || 0) + 0.30 },
-        turn: 'enemy',
-      } : prev);
-      addLog(`🪬 You use ${item.name}! +30% dodge chance for this battle.`, 'buff');
+      const alreadyActive = (battleState?.buffs?.dodgeChance ?? 0) > 0;
+      if (alreadyActive) {
+        addLog(`🪬 Evasion Tonic is already active!`, 'buff');
+        setBattleState(prev => prev ? { ...prev, turn: 'enemy' } : prev);
+      } else {
+        setBattleState(prev => prev ? {
+          ...prev,
+          buffs: { ...prev.buffs, dodgeChance: 0.30 }, // fixed 30%, not additive
+          turn: 'enemy',
+        } : prev);
+        addLog(`🪬 You use ${item.name}! 30% dodge chance for this battle.`, 'buff');
+      }
     }
     if (inBattle && item.effect === 'piercing_oil') {
       setBattleState(prev => prev ? {
@@ -445,6 +451,16 @@ export function useGameState() {
         return;
       }
       setBattleState(prev => ({ ...prev, enemy: { ...prev.enemy, hp: newHp }, enemyStatus: newEnemyStatus }));
+    }
+
+    // ── Player dodge check — applies to ALL attacks including boss ────────────
+    const playerDodge = battleState.buffs?.dodgeChance ?? 0;
+    if (playerDodge > 0 && Math.random() < playerDodge) {
+      addLog(`🪬 You dodge ${enemy.name}'s attack!`, 'player');
+      setBattleState(prev => ({
+        ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1, lastDmg: null,
+      }));
+      return;
     }
 
     // ── Boss pattern logic ──────────────────────────────────────────────────
@@ -504,16 +520,6 @@ export function useGameState() {
     }
 
     // ── Normal enemy attack ─────────────────────────────────────────────────
-    // Check if player dodges (from Evasion Tonic buff)
-    const playerDodge = battleState.buffs?.dodgeChance ?? 0;
-    if (playerDodge > 0 && Math.random() < playerDodge) {
-      addLog(`🪬 You dodge ${enemy.name}'s attack!`, 'player');
-      setBattleState(prev => ({
-        ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1, lastDmg: null,
-      }));
-      return;
-    }
-
     const def = player.def + player.armor.def + defBonus + (battleState.buffs?.def || 0);
     const dmg = Math.max(1, enemy.atk - def + Math.floor(Math.random() * 6) - 2);
 

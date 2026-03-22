@@ -94,11 +94,12 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .questIcon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
 
-.questInfo { flex: 1; }
+.questInfo { flex: 1; min-width: 0; }
 
 .questTitle {
   font-family: 'Cinzel', serif;
@@ -121,6 +122,13 @@
   align-items: flex-end;
   gap: 6px;
   flex-shrink: 0;
+  min-width: 90px;
+}
+
+@media (max-width: 480px) {
+  .questTop { flex-direction: column; gap: 8px; }
+  .questRight { flex-direction: row; align-items: center; width: 100%; justify-content: space-between; }
+  .claimBtn { width: auto; }
 }
 
 .reward {
