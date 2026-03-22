@@ -4,12 +4,14 @@ A dark fantasy action/adventure browser RPG built with **React + Vite**. No exte
 
 ## 🎮 Gameplay
 
-- **Explore** 6 unique locations across a cursed land
-- **Battle** 10 enemy types in turn-based combat, including a final boss with multiple attack phases
-- **Level up** every 2 levels choose a perk from the skill tree
+- **Explore** 7 unique locations across a cursed land
+- **Battle** 13 enemy types in turn-based combat, including a final boss with multiple attack phases
+- **Level up** — at every odd level (3, 5, 7, 9, 11...) a skill tree popup lets you choose a permanent perk — until all paths are mastered
 - **Status effects** — Poison, Burn, and Stun affect both players and enemies
+- **Dodge mechanic** — Phantom Knights phase through attacks; Evasion Tonic gives you the same ability
+- **Loot drops** — enemies have a 40% chance to drop materials or consumables from their location
 - **Equip** weapons and armor from the shop (5 tiers each)
-- **Use items** like potions, elixirs, and antidotes in and out of battle
+- **Use items** like potions, elixirs, antidotes, venom vials, and flame scrolls in battle
 - **Defend** to reduce incoming damage on the next hit
 - **Flee** from battles (60% success rate, 100% with Shadowstep perk)
 - **Complete quests** from the Tavern notice board for bonus gold and XP
@@ -17,7 +19,7 @@ A dark fantasy action/adventure browser RPG built with **React + Vite**. No exte
 
 ## 🌳 Skill Tree
 
-Every 2 levels a perk picker appears. Choose one perk from three paths — choices are permanent for the run.
+At every odd level from 3 upward (3, 5, 7, 9, 11...) a perk picker appears — until all 15 perks across all paths are unlocked. Choose one perk from three paths — choices are permanent for the run.
 
 ### 🛡️ Warrior Path — Tank
 | Perk | Effect |
@@ -79,16 +81,16 @@ The next attack is previewed in the battle UI.
 
 ## 🗺️ Locations
 
-| Location | Danger | Notes |
-|----------|--------|-------|
-| Ashenveil Village | Safe | Starting area |
-| The Broken Flagon (Tavern) | Safe | Shop + Rest + Quest Board |
-| Gregor's Forge (Blacksmith) | Safe | Weapons & armor shop |
-| Edge of the Dark Wood | Low | Goblins, Dire Wolves |
-| The Dark Wood | Medium | Orcs, Shadow Wolves, Wraiths |
-| Ruined Shrine of the Ancients | High | Skeleton Warriors, Cursed Shades |
-| The Sunken Dungeon | High | Cave Trolls, Bone Archers, Phantom Knights |
-| Ancient Ruins of Vor'thaan | Boss | Stone Golems, Shadow Knights + Shadow King |
+| Location | Danger | Enemies | Loot Drops |
+|----------|--------|---------|------------|
+| Ashenveil Village | Safe | — | — |
+| The Broken Flagon (Tavern) | Safe | — | Health Potion |
+| Gregor's Forge (Blacksmith) | Safe | — | — |
+| Edge of the Dark Wood | Low | Goblins, Dire Wolves | 🟫 Leather Scrap |
+| The Dark Wood | Medium | Orcs, Shadow Wolves, Wraiths | 🌿 Glowmoss |
+| Ruined Shrine of the Ancients | High | Skeleton Warriors, Cursed Shades | Health Potion, Ancient Scroll |
+| The Sunken Dungeon | High | Cave Trolls, Bone Archers, Phantom Knights | Greater Potion, Piercing Oil |
+| Ancient Ruins of Vor'thaan | Boss | Stone Golems, Shadow Knights + Shadow King | Health Potion, Elixir of Power |
 
 ## 📜 Quest System
 

@@ -200,8 +200,10 @@ export function useGameState() {
       newMaxHp = s.maxHp; newAtk = s.atk; newDef = s.def;
       leveledUp = true;
       // Trigger skill tree every 2 levels, starting from level 4
-      // Trigger skill tree at levels 3, 5, 7, 9 (every 2 levels starting from 3)
-      if (newLevel % 2 === 1 && newLevel >= 3) skillTrigger = true;
+      // Trigger skill tree at every odd level from 3 upward, unless all perks are already maxed
+      const totalPerks = Object.values(SKILL_PATHS).reduce((sum, path) => sum + path.perks.length, 0);
+      const alreadyMaxed = (p.perks || []).length >= totalPerks;
+      if (newLevel % 2 === 1 && newLevel >= 3 && !alreadyMaxed) skillTrigger = true;
     }
     if (leveledUp) {
       addLog(`⭐ Level Up! You are now Level ${newLevel}!`, 'levelup');
