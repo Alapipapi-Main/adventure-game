@@ -585,12 +585,23 @@ export function useGameState() {
     const { enemy } = battleState;
     addLog(`🏆 You defeated ${enemy.name}! +${enemy.xp} XP, +${enemy.gold} Gold`, 'victory');
     advanceQuests('kill', enemy.id);
+
+    // 40% chance to drop a loot item from the current location
+    const locationData = LOCATIONS[player.location];
+    const lootPool = locationData?.loot?.filter(l => l.type === 'material' || l.type === 'consumable') ?? [];
+    let droppedItem = null;
+    if (lootPool.length > 0 && Math.random() < 0.40) {
+      droppedItem = { ...lootPool[Math.floor(Math.random() * lootPool.length)] };
+      addLog(`🎁 ${enemy.name} dropped ${droppedItem.icon} ${droppedItem.name}!`, 'victory');
+    }
+
     setPlayer(p => {
       const withRewards = {
         ...p,
         gold: p.gold + enemy.gold,
         totalKills: p.totalKills + 1,
         defeatedBosses: enemy.isBoss ? [...p.defeatedBosses, enemy.id] : p.defeatedBosses,
+        inventory: droppedItem ? [...p.inventory, droppedItem] : p.inventory,
       };
       return applyXp(withRewards, enemy.xp);
     });
