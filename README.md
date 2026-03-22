@@ -112,12 +112,6 @@ The next attack is previewed in the battle UI.
 | Troll Slayer | Crush 3 Cave Trolls | 160g + 270 XP |
 | Archer Down | Silence 3 Bone Archers | 170g + 280 XP |
 | Ghost Buster | Destroy 3 Phantom Knights | 200g + 340 XP |
-| Poison Master | Inflict poison on 5 enemies | 160g + 280 XP |
-| Pyromancer | Burn 5 enemies | 190g + 320 XP |
-| Dungeon Explorer | Visit the Sunken Dungeon | 90g + 140 XP |
-| Troll Slayer | Crush 3 Cave Trolls | 160g + 270 XP |
-| Archer Down | Silence 3 Bone Archers | 170g + 280 XP |
-| Ghost Buster | Destroy 3 Phantom Knights | 200g + 340 XP |
 
 ## 💾 Save System
 
