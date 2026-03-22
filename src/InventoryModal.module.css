@@ -116,6 +116,7 @@
 }
 
 .useBtn:hover { background: rgba(46,204,113,0.3); }
+.useBtn:disabled { opacity: 0.4; cursor: not-allowed; background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1); color: var(--text-muted); }
 
 .statsGrid { display: flex; flex-direction: column; gap: 6px; }
 

@@ -1,7 +1,7 @@
 import { DIFFICULTIES } from './gameData';
 import styles from './InventoryModal.module.css';
 
-export default function InventoryModal({ player, onUse, onClose, difficulty }) {
+export default function InventoryModal({ player, onUse, onClose, difficulty, battleState }) {
   const perks        = player.perks        || [];
   const critChance   = player.critChance   ?? 0.15;
   const critMult     = player.critMult     ?? 1.75;
@@ -58,9 +58,20 @@ export default function InventoryModal({ player, onUse, onClose, difficulty }) {
                     <div className={styles.itemName}>{item.name}</div>
                     <div className={styles.itemDesc}>{item.description}</div>
                   </div>
-                  <button className={styles.useBtn} onClick={() => { onUse(item); onClose(); }}>
-                    Use
-                  </button>
+                  {(() => {
+                    const alreadyActive = item.effect === 'evasion_tonic' &&
+                      battleState && (battleState.buffs?.dodgeChance ?? 0) > 0;
+                    return (
+                      <button
+                        className={styles.useBtn}
+                        onClick={() => { if (!alreadyActive) { onUse(item); onClose(); } }}
+                        disabled={alreadyActive}
+                        title={alreadyActive ? 'Already active this battle' : ''}
+                      >
+                        {alreadyActive ? '✓ Active' : 'Use'}
+                      </button>
+                    );
+                  })()}
                 </div>
               ))}
             </div>
