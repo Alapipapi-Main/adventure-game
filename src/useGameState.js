@@ -3,7 +3,7 @@ import {
   ENEMIES, LOCATIONS, WEAPONS, ARMORS,
   INITIAL_PLAYER, INITIAL_QUESTS, QUESTS,
   DIFFICULTIES, BOSS_PATTERNS, BOSS_ATTACKS,
-  SKILL_PATHS, STATUS_EFFECTS, ENEMY_STATUS_CHANCE,
+  SKILL_PATHS, STATUS_EFFECTS, ENEMY_STATUS_CHANCE, ENEMY_DODGE_CHANCE,
   getXpToNext, getLevelStats,
 } from './gameData';
 
@@ -298,7 +298,7 @@ export function useGameState() {
 
   const playerAttack = useCallback(() => {
     if (!battleState || battleState.turn !== 'player') return;
-    const defPen = player.defPen || 0;
+    const defPen = (player.defPen || 0) + (battleState.buffs?.defPen || 0);
     const atk = player.atk + player.weapon.atk + battleState.buffs.atk;
     const enemyDef = Math.max(0, battleState.enemy.def - defPen);
     const raw = Math.max(1, atk - enemyDef + Math.floor(Math.random() * 6) - 2);
@@ -306,6 +306,14 @@ export function useGameState() {
     const critMult   = player.critMult   ?? 1.75;
     const isCrit = Math.random() < critChance;
     const finalDmg = isCrit ? Math.floor(raw * critMult) : raw;
+
+    // Check if enemy dodges
+    const enemyDodge = ENEMY_DODGE_CHANCE[battleState.enemy.id] ?? 0;
+    if (enemyDodge > 0 && Math.random() < enemyDodge) {
+      addLog(`👻 ${battleState.enemy.name} phases through your attack — Miss!`, 'danger');
+      setBattleState(prev => ({ ...prev, turn: 'enemy', lastDmg: { value: 0, isCrit: false, target: 'enemy', id: Date.now(), dodged: true } }));
+      return;
+    }
 
     // Check status application
     const poisonRoll = Math.random();
@@ -387,7 +395,23 @@ export function useGameState() {
         return { ...prev, enemyStatus: [...(prev.enemyStatus || []), { id: 'burn', turnsLeft: 2 }], turn: 'enemy' };
       });
     }
-    if (inBattle && !['inflict_poison', 'inflict_burn'].includes(item.effect)) {
+    if (inBattle && item.effect === 'evasion_tonic') {
+      setBattleState(prev => prev ? {
+        ...prev,
+        buffs: { ...prev.buffs, dodgeChance: (prev.buffs?.dodgeChance || 0) + 0.30 },
+        turn: 'enemy',
+      } : prev);
+      addLog(`🪬 You use ${item.name}! +30% dodge chance for this battle.`, 'buff');
+    }
+    if (inBattle && item.effect === 'piercing_oil') {
+      setBattleState(prev => prev ? {
+        ...prev,
+        buffs: { ...prev.buffs, defPen: (prev.buffs?.defPen || 0) + item.value },
+        turn: 'enemy',
+      } : prev);
+      addLog(`🗡️ You use ${item.name}! +${item.value} DEF penetration for this battle.`, 'buff');
+    }
+    if (inBattle && !['inflict_poison', 'inflict_burn', 'evasion_tonic', 'piercing_oil'].includes(item.effect)) {
       setBattleState(prev => prev ? { ...prev, turn: 'enemy' } : prev);
     }
   }, [addLog, advanceQuests]);
@@ -480,6 +504,16 @@ export function useGameState() {
     }
 
     // ── Normal enemy attack ─────────────────────────────────────────────────
+    // Check if player dodges (from Evasion Tonic buff)
+    const playerDodge = battleState.buffs?.dodgeChance ?? 0;
+    if (playerDodge > 0 && Math.random() < playerDodge) {
+      addLog(`🪬 You dodge ${enemy.name}'s attack!`, 'player');
+      setBattleState(prev => ({
+        ...prev, turn: 'player', defendBonus: 0, round: (prev.round || 1) + 1, lastDmg: null,
+      }));
+      return;
+    }
+
     const def = player.def + player.armor.def + defBonus + (battleState.buffs?.def || 0);
     const dmg = Math.max(1, enemy.atk - def + Math.floor(Math.random() * 6) - 2);
 

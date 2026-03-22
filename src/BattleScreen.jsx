@@ -2,7 +2,14 @@ import { useEffect, useState, useRef } from 'react';
 import { BOSS_PATTERNS, BOSS_ATTACKS, STATUS_EFFECTS } from './gameData';
 import styles from './BattleScreen.module.css';
 
-function FloatingNumber({ value, isCrit, target, id }) {
+function FloatingNumber({ value, isCrit, target, dodged, id }) {
+  if (dodged) {
+    return (
+      <div className={`${styles.floatNum} ${styles.floatMiss} ${target === 'player' ? styles.floatPlayer : styles.floatEnemy}`}>
+        MISS!
+      </div>
+    );
+  }
   return (
     <div
       key={id}
@@ -27,13 +34,15 @@ export default function BattleScreen({
   // Trigger animations when lastDmg changes
   useEffect(() => {
     if (!battleState?.lastDmg) return;
-    const { value, isCrit, target, id } = battleState.lastDmg;
+    const { value, isCrit, target, id, dodged } = battleState.lastDmg;
     if (prevDmg.current === id) return;
     prevDmg.current = id;
 
     const floatId = Date.now() + Math.random();
-    setFloats(prev => [...prev, { value, isCrit, target, id: floatId }]);
+    setFloats(prev => [...prev, { value, isCrit, target, dodged, id: floatId }]);
     setTimeout(() => setFloats(prev => prev.filter(f => f.id !== floatId)), 900);
+
+    if (dodged) return; // no shake/flash for a miss
 
     if (target === 'enemy') {
       setEnemyShake(true);

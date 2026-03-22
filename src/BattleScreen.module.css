@@ -338,3 +338,9 @@
   color: #f1c40f !important;
   animation: pulse 0.8s ease-in-out infinite;
 }
+
+.floatMiss {
+  color: #aaaaaa !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 0.1em;
+}

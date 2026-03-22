@@ -87,11 +87,12 @@ The next attack is previewed in the battle UI.
 | Edge of the Dark Wood | Low | Goblins, Dire Wolves |
 | The Dark Wood | Medium | Orcs, Shadow Wolves, Wraiths |
 | Ruined Shrine of the Ancients | High | Skeleton Warriors, Cursed Shades |
+| The Sunken Dungeon | High | Cave Trolls, Bone Archers, Phantom Knights |
 | Ancient Ruins of Vor'thaan | Boss | Stone Golems, Shadow Knights + Shadow King |
 
 ## 📜 Quest System
 
-12 quests available from the Tavern quest board:
+17 quests available from the Tavern quest board:
 
 | Quest | Goal | Reward |
 |-------|------|--------|
@@ -107,6 +108,16 @@ The next attack is previewed in the battle UI.
 | Ruins Delver | Slay 3 Shadow Knights | 250g + 450 XP |
 | Poison Master | Inflict poison on 5 enemies | 160g + 280 XP |
 | Pyromancer | Burn 5 enemies | 190g + 320 XP |
+| Dungeon Explorer | Visit the Sunken Dungeon | 90g + 140 XP |
+| Troll Slayer | Crush 3 Cave Trolls | 160g + 270 XP |
+| Archer Down | Silence 3 Bone Archers | 170g + 280 XP |
+| Ghost Buster | Destroy 3 Phantom Knights | 200g + 340 XP |
+| Poison Master | Inflict poison on 5 enemies | 160g + 280 XP |
+| Pyromancer | Burn 5 enemies | 190g + 320 XP |
+| Dungeon Explorer | Visit the Sunken Dungeon | 90g + 140 XP |
+| Troll Slayer | Crush 3 Cave Trolls | 160g + 270 XP |
+| Archer Down | Silence 3 Bone Archers | 170g + 280 XP |
+| Ghost Buster | Destroy 3 Phantom Knights | 200g + 340 XP |
 
 ## 💾 Save System
 

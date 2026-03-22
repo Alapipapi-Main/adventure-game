@@ -43,9 +43,21 @@ export const LOCATIONS = {
     name: 'The Dark Wood',
     description: 'Twisted branches block out the moonlight. Bones litter the forest floor. Something large moves in the underbrush — watching you.',
     image: '🌑',
-    exits: ['forest_edge', 'ancient_ruins'],
+    exits: ['forest_edge', 'sunken_dungeon', 'ancient_ruins'],
     enemies: ['orc', 'dark_wolf', 'forest_wraith'],
     loot: [{ id: 'magic_herb', name: 'Glowmoss', type: 'material', value: 15, icon: '🌿', description: 'A luminescent herb used in potions' }],
+  },
+  sunken_dungeon: {
+    id: 'sunken_dungeon',
+    name: 'The Sunken Dungeon',
+    description: 'Collapsed stone corridors stretch into flooded darkness. The air reeks of mould and old blood. Something heavy drags itself through the standing water below.',
+    image: '🕳️',
+    exits: ['dark_wood', 'ancient_ruins'],
+    enemies: ['cave_troll', 'bone_archer', 'phantom_knight'],
+    loot: [
+      { id: 'greater_potion', name: 'Greater Potion', type: 'consumable', effect: 'heal', value: 80, icon: '💊', description: 'Restores 80 HP' },
+      { id: 'piercing_oil', name: 'Piercing Oil', type: 'consumable', effect: 'piercing_oil', value: 15, icon: '🗡️', description: 'Boosts DEF penetration by 15 for this battle' },
+    ],
   },
   ruined_shrine: {
     id: 'ruined_shrine',
@@ -64,7 +76,7 @@ export const LOCATIONS = {
     name: "Ancient Ruins of Vor'thaan",
     description: 'The ruins of a once-great civilization. The air crackles with dark magic. At the center looms a massive obsidian throne — and upon it sits the Shadow King.',
     image: '🏚️',
-    exits: ['dark_wood'],
+    exits: ['dark_wood', 'sunken_dungeon'],
     enemies: ['stone_golem', 'shadow_knight'],
     loot: [
       { id: 'health_potion', name: 'Health Potion', type: 'consumable', effect: 'heal', value: 40, icon: '🧪', description: 'Restores 40 HP' },
@@ -82,6 +94,9 @@ export const ENEMIES = {
   forest_wraith: { id: 'forest_wraith', name: 'Forest Wraith', icon: '👻', hp: 55, maxHp: 55, atk: 22, def: 4, xp: 60, gold: 20, level: 4 },
   skeleton_warrior: { id: 'skeleton_warrior', name: 'Skeleton Warrior', icon: '💀', hp: 80, maxHp: 80, atk: 25, def: 8, xp: 80, gold: 35, level: 5 },
   cursed_shade: { id: 'cursed_shade', name: 'Cursed Shade', icon: '🌑', hp: 65, maxHp: 65, atk: 28, def: 6, xp: 85, gold: 40, level: 5 },
+  cave_troll: { id: 'cave_troll', name: 'Cave Troll', icon: '🪨', hp: 130, maxHp: 130, atk: 22, def: 10, xp: 100, gold: 45, level: 5 },
+  bone_archer: { id: 'bone_archer', name: 'Bone Archer', icon: '🏹', hp: 55, maxHp: 55, atk: 32, def: 4, xp: 95, gold: 50, level: 5 },
+  phantom_knight: { id: 'phantom_knight', name: 'Phantom Knight', icon: '👻', hp: 85, maxHp: 85, atk: 28, def: 8, xp: 110, gold: 55, level: 6, dodgeChance: 0.20 },
   stone_golem: { id: 'stone_golem', name: 'Stone Golem', icon: '🗿', hp: 120, maxHp: 120, atk: 30, def: 15, xp: 120, gold: 60, level: 6 },
   shadow_knight: { id: 'shadow_knight', name: 'Shadow Knight', icon: '⚔️', hp: 100, maxHp: 100, atk: 35, def: 12, xp: 130, gold: 70, level: 7 },
   shadow_king: { id: 'shadow_king', name: 'The Shadow King', icon: '👑', hp: 250, maxHp: 250, atk: 45, def: 20, xp: 500, gold: 200, level: 10, isBoss: true },
@@ -109,8 +124,10 @@ export const SHOP_ITEMS = [
   { id: 'supreme_potion',  name: 'Supreme Potion',  type: 'consumable', effect: 'heal',         value: 150, icon: '⚗️', price: 120, description: 'Restores 150 HP — for the toughest fights' },
   { id: 'elixir',          name: 'Elixir of Power', type: 'consumable', effect: 'buff',         value: 20,  icon: '✨', price: 100, description: 'Boosts ATK by 20 for this battle' },
   { id: 'antidote',        name: 'Antidote',        type: 'consumable', effect: 'cure',         value: 0,   icon: '🌿', price: 25,  description: 'Cures poison and burn' },
-  { id: 'venom_vial',      name: 'Venom Vial',      type: 'consumable', effect: 'inflict_poison', value: 0, icon: '🐍', price: 60,  description: 'Poisons the enemy for 3 turns (8 dmg/turn)' },
-  { id: 'flame_scroll',    name: 'Flame Scroll',    type: 'consumable', effect: 'inflict_burn',  value: 0,  icon: '🔥', price: 80,  description: 'Burns the enemy for 2 turns (12 dmg/turn)' },
+  { id: 'venom_vial',      name: 'Venom Vial',      type: 'consumable', effect: 'inflict_poison', value: 0,  icon: '🐍', price: 60,  description: 'Poisons the enemy for 3 turns (8 dmg/turn)' },
+  { id: 'flame_scroll',    name: 'Flame Scroll',    type: 'consumable', effect: 'inflict_burn',   value: 0,  icon: '🔥', price: 80,  description: 'Burns the enemy for 2 turns (12 dmg/turn)' },
+  { id: 'evasion_tonic',   name: 'Evasion Tonic',   type: 'consumable', effect: 'evasion_tonic',  value: 0,  icon: '🪬', price: 75,  description: 'Grants 30% dodge chance for this battle' },
+  { id: 'piercing_oil',    name: 'Piercing Oil',    type: 'consumable', effect: 'piercing_oil',   value: 15, icon: '🗡️', price: 90,  description: 'Boosts DEF penetration by 15 for this battle' },
 ];
 
 // ── Quest definitions ─────────────────────────────────────────────────────────
@@ -233,6 +250,46 @@ export const QUESTS = [
     target: 'burn',
     goal: 5,
     reward: { gold: 190, xp: 320 },
+  },
+  {
+    id: 'dungeon_explorer',
+    title: 'Dungeon Explorer',
+    description: 'Descend into the Sunken Dungeon and face what lurks in the dark.',
+    icon: '🕳️',
+    type: 'visit_location',
+    target: 'sunken_dungeon',
+    goal: 1,
+    reward: { gold: 90, xp: 140 },
+  },
+  {
+    id: 'troll_slayer',
+    title: 'Troll Slayer',
+    description: 'Cave Trolls guard the dungeon corridors. Crush 3 of them.',
+    icon: '🪨',
+    type: 'kill_enemy',
+    target: 'cave_troll',
+    goal: 3,
+    reward: { gold: 160, xp: 270 },
+  },
+  {
+    id: 'archer_down',
+    title: 'Archer Down',
+    description: 'Bone Archers pick off intruders from the shadows. Silence 3 of them.',
+    icon: '🏹',
+    type: 'kill_enemy',
+    target: 'bone_archer',
+    goal: 3,
+    reward: { gold: 170, xp: 280 },
+  },
+  {
+    id: 'ghost_buster',
+    title: 'Ghost Buster',
+    description: 'Phantom Knights phase in and out of reality. Destroy 3 of these elusive foes.',
+    icon: '👻',
+    type: 'kill_enemy',
+    target: 'phantom_knight',
+    goal: 3,
+    reward: { gold: 200, xp: 340 },
   },
 ];
 
@@ -359,8 +416,14 @@ export const STATUS_EFFECTS = {
 
 // Enemies that can inflict status effects on the player
 export const ENEMY_STATUS_CHANCE = {
-  forest_wraith: { effect: 'poison', chance: 0.30 },
-  cursed_shade:  { effect: 'poison', chance: 0.35 },
-  stone_golem:   { effect: 'stun',   chance: 0.25 },
-  shadow_knight: { effect: 'burn',   chance: 0.20 },
+  forest_wraith:  { effect: 'poison', chance: 0.30 },
+  cursed_shade:   { effect: 'poison', chance: 0.35 },
+  stone_golem:    { effect: 'stun',   chance: 0.25 },
+  shadow_knight:  { effect: 'burn',   chance: 0.20 },
+  phantom_knight: { effect: 'poison', chance: 0.25 },
+};
+
+// Enemies that can dodge player attacks
+export const ENEMY_DODGE_CHANCE = {
+  phantom_knight: 0.20,
 };
