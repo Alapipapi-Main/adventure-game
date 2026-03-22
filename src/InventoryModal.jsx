@@ -51,17 +51,21 @@ export default function InventoryModal({ player, onUse, onClose, difficulty, bat
               <p className={styles.empty}>Your bag is empty.</p>
             )}
             <div className={styles.items}>
-              {player.inventory.map((item, idx) => (
-                <div key={idx} className={styles.item}>
-                  <span className={styles.itemIcon}>{item.icon}</span>
-                  <div className={styles.itemInfo}>
-                    <div className={styles.itemName}>{item.name}</div>
-                    <div className={styles.itemDesc}>{item.description}</div>
-                  </div>
-                  {(() => {
-                    const alreadyActive = item.effect === 'evasion_tonic' &&
-                      battleState && (battleState.buffs?.dodgeChance ?? 0) > 0;
-                    return (
+              {player.inventory.map((item, idx) => {
+                const isMaterial   = item.type === 'material' || item.type === 'key_item';
+                const inBattle     = !!battleState;
+                const alreadyActive = item.effect === 'evasion_tonic' &&
+                  battleState && (battleState.buffs?.dodgeChance ?? 0) > 0;
+                // Materials never get a Use button; consumables only in battle
+                const showUse = !isMaterial && inBattle;
+                return (
+                  <div key={idx} className={styles.item}>
+                    <span className={styles.itemIcon}>{item.icon}</span>
+                    <div className={styles.itemInfo}>
+                      <div className={styles.itemName}>{item.name}</div>
+                      <div className={styles.itemDesc}>{item.description}</div>
+                    </div>
+                    {showUse && (
                       <button
                         className={styles.useBtn}
                         onClick={() => { if (!alreadyActive) { onUse(item); onClose(); } }}
@@ -70,10 +74,10 @@ export default function InventoryModal({ player, onUse, onClose, difficulty, bat
                       >
                         {alreadyActive ? '✓ Active' : 'Use'}
                       </button>
-                    );
-                  })()}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
