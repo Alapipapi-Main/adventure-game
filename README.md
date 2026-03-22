@@ -84,7 +84,7 @@ The next attack is previewed in the battle UI.
 | Location | Danger | Enemies | Loot Drops |
 |----------|--------|---------|------------|
 | Ashenveil Village | Safe | — | — |
-| The Broken Flagon (Tavern) | Safe | — | Health Potion |
+| The Broken Flagon (Tavern) | Safe | — | — |
 | Gregor's Forge (Blacksmith) | Safe | — | — |
 | Edge of the Dark Wood | Low | Goblins, Dire Wolves | 🟫 Leather Scrap |
 | The Dark Wood | Medium | Orcs, Shadow Wolves, Wraiths | 🌿 Glowmoss |

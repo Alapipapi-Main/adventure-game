@@ -15,7 +15,7 @@ export const LOCATIONS = {
     image: '🍺',
     exits: ['village'],
     enemies: [],
-    loot: [{ id: 'health_potion', name: 'Health Potion', type: 'consumable', effect: 'heal', value: 40, icon: '🧪', description: 'Restores 40 HP' }],
+    loot: [],
     shopItems: true,
     hasQuestBoard: true,
   },
