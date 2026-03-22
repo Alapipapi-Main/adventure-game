@@ -222,6 +222,7 @@ export function useGameState() {
 
   // ── Skill tree perk picker ────────────────────────────────────────────────
   const pickPerk = useCallback((perkId, pathId) => {
+    if (!perkId) { setPendingLevelUp(false); return; } // dismissed when all paths maxed
     const path = SKILL_PATHS[pathId];
     if (!path) return;
     const perk = path.perks.find(p => p.id === perkId);

@@ -132,3 +132,19 @@
 }
 
 .maxedIcon { font-size: 3rem; }
+
+.dismissBtn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  padding: 10px 28px;
+  border-radius: 8px;
+  border: 1px solid var(--gold);
+  background: rgba(201,168,76,0.1);
+  color: var(--gold);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.dismissBtn:hover {
+  background: rgba(201,168,76,0.2);
+}

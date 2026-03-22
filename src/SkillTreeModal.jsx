@@ -41,6 +41,9 @@ export default function SkillTreeModal({ player, onPick }) {
             <div className={styles.maxed}>
               <div className={styles.maxedIcon}>🌟</div>
               <p>All paths mastered — you are at peak power!</p>
+              <button className={styles.dismissBtn} onClick={() => onPick(null, null)}>
+                Continue Adventure
+              </button>
             </div>
           )}
         </div>
