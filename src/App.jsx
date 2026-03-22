@@ -16,7 +16,7 @@ import './App.css';
 
 export default function App() {
   const {
-    player, screen, setScreen, battleState, log, notification, quests, activeSlot, difficulty,
+    player, screen, setScreen, battleState, setBattleState, log, notification, quests, activeSlot, difficulty,
     pendingLevelUp, pickPerk,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
     resolveVictory, useItem, buyItem, rest, claimQuest, addLog,
@@ -63,6 +63,7 @@ export default function App() {
     if (success) {
       playSfx('flee');
       addLog('💨 You fled from battle!', 'travel');
+      setBattleState(null);
       setScreen('explore');
     } else {
       playSfx('hit');

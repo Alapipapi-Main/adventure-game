@@ -662,7 +662,7 @@ export function useGameState() {
   }, []);
 
   return {
-    player, screen, setScreen, battleState, log, notification, quests, activeSlot, difficulty,
+    player, screen, setScreen, battleState, setBattleState, log, notification, quests, activeSlot, difficulty,
     pendingLevelUp, pickPerk,
     travel, startBattle, playerAttack, playerDefend, enemyAttack,
     resolveVictory, useItem, buyItem, rest, claimQuest, addLog, notify,
