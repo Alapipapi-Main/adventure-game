@@ -171,7 +171,7 @@ export default function BattleScreen({
           )}
           <div className={styles.statsRow}>
             <span>⚔️ {player.atk + player.weapon.atk + (battleState.buffs?.atk || 0)}</span>
-            <span>🛡️ {player.def + player.armor.def}</span>
+            <span>🛡️ {player.def + player.armor.def + (battleState.buffs?.def || 0)}</span>
           </div>
         </div>
       </div>

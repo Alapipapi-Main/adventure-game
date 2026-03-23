@@ -88,7 +88,10 @@ export default function App() {
   useEffect(() => {
     if (player.hp <= 0 && screen === 'battle') {
       playSfx('death');
-      setTimeout(() => setScreen('gameover'), 600);
+      setTimeout(() => {
+        setBattleState(null);
+        setScreen('gameover');
+      }, 600);
     }
   }, [player.hp, screen]);
 
