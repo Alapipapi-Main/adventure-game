@@ -230,6 +230,16 @@ export const QUESTS = [
     reward: { gold: 120, xp: 200 },
   },
   {
+  id: 'shadow_hunter',
+  title: 'Shadow Hunter',
+  description: 'Defeat 5 Shadow Wolves lurking in the Dark Wood.',
+  icon: '🐾',
+  type: 'kill_enemy',
+  target: 'dark_wolf',
+  goal: 5,
+  reward: { gold: 220, xp: 350 },
+  },
+  {
     id: 'shrine_seeker',
     title: 'Shrine Seeker',
     description: 'Seek out the Ruined Shrine of the Ancients hidden deep in the forest.',
