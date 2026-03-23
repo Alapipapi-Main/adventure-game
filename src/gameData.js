@@ -27,7 +27,6 @@ export const LOCATIONS = {
     exits: ['village'],
     enemies: [],
     loot: [],
-    shopItems: true,
     hasCrafting: true,
   },
   forest_edge: {

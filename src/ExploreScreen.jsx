@@ -79,23 +79,14 @@ export default function ExploreScreen({ player, quests, onTravel, onStartBattle,
             </button>
           )}
 
-          {hasShop && hasCrafting && (
-            <>
-              <button className={`${styles.actionBtn} ${styles.shopBtn}`} onClick={onShop}>
-                <span>🛒</span>
-                <div>
-                  <div className={styles.btnTitle}>Buy Equipment</div>
-                  <div className={styles.btnSub}>Weapons, armor & upgrades</div>
-                </div>
-              </button>
-              <button className={`${styles.actionBtn} ${styles.craftBtn}`} onClick={onCraft}>
-                <span>⚒️</span>
-                <div>
-                  <div className={styles.btnTitle}>Craft Items</div>
-                  <div className={styles.btnSub}>Combine materials at the forge</div>
-                </div>
-              </button>
-            </>
+          {hasCrafting && (
+            <button className={`${styles.actionBtn} ${styles.craftBtn}`} onClick={onCraft}>
+              <span>⚒️</span>
+              <div>
+                <div className={styles.btnTitle}>Craft Items</div>
+                <div className={styles.btnSub}>Combine materials at the forge</div>
+              </div>
+            </button>
           )}
 
           {canRest && (
