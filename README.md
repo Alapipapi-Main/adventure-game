@@ -131,6 +131,7 @@ Materials drop during exploration: **Leather Scrap** from the Forest Edge, **Glo
 | Ghost Buster | Destroy 3 Phantom Knights | 200g + 340 XP |
 | Apprentice Crafter | Craft 3 items at the Forge | 120g + 180 XP |
 | Toxic Brewer | Craft a Toxic Flask | 180g + 280 XP |
+| Shadow Hunter | Defeat 5 Shadow Wolves | 220g + 350 XP |
 
 ## 💾 Save System
 
