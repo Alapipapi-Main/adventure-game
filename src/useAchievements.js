@@ -31,8 +31,8 @@ export default function useAchievements(notify) {
   const checkCombat = useCallback((player, enemy, battleFlags) => {
     const bestiary = recordBestiaryKill(enemy.id);
 
-    // First kill
-    if (player.totalKills === 0) unlock('first_blood');
+    // First kill — fires on any kill, unlock() is idempotent so only fires once
+    unlock('first_blood');
 
     // Kill milestones (totalKills is pre-increment here, so +1)
     const newTotal = player.totalKills + 1;
