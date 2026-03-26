@@ -34,10 +34,12 @@ export default function useAchievements(notify) {
     // First kill — fires on any kill, unlock() is idempotent so only fires once
     unlock('first_blood');
 
-    // Kill milestones (totalKills is pre-increment here, so +1)
-    const newTotal = player.totalKills + 1;
-    if (newTotal >= 50)  unlock('veteran');
-    if (newTotal >= 100) unlock('warlord');
+    // Kill milestones — use the higher of bestiary total or player.totalKills+1
+    // so old saves (before bestiary existed) still trigger correctly
+    const bestiaryTotal = Object.values(bestiary).reduce((sum, e) => sum + (e.kills || 0), 0);
+    const killTotal = Math.max(bestiaryTotal, player.totalKills + 1);
+    if (killTotal >= 50)  unlock('veteran');
+    if (killTotal >= 100) unlock('warlord');
 
     // Boss slayer
     if (enemy.id === 'shadow_king') unlock('boss_slayer');
