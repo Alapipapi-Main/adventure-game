@@ -39,6 +39,7 @@ export function TitleScreen({ onNewGame, onContinue, hasAnySave }) {
           <div className={styles.feature}><span>☠️</span> Status Effects</div>
           <div className={styles.feature}><span>⚒️</span> Crafting System</div>
           <div className={styles.feature}><span>👑</span> Epic Boss Battle</div>
+          <div className={styles.feature}><span>🗺️</span> Animated World Map</div>
           <div className={styles.feature}><span>🏆</span> 22 Achievements</div>
           <div className={styles.feature}><span>📖</span> Bestiary</div>
           <div className={styles.feature}><span>💾</span> 3 Save Slots</div>

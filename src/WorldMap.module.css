@@ -1,0 +1,126 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px;
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.95);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--bg-mid), var(--bg-card));
+  flex-wrap: wrap;
+}
+
+.title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.95rem;
+  color: var(--gold-light);
+  flex-shrink: 0;
+}
+
+.legend {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+}
+
+.closeBtn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.closeBtn:hover { background: rgba(255,255,255,0.1); color: var(--text-bright); }
+
+.mapWrap {
+  padding: 12px 20px 4px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(201,168,76,0.04) 0%, transparent 70%),
+              var(--bg-deepest);
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Pulse animation for current location */
+.pulseRing {
+  animation: pulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.9; r: 22; }
+  50%       { opacity: 0.3; r: 26; }
+}
+
+/* Dashed ring for reachable locations */
+.reachableRing {
+  animation: spin 8s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes spin {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -40; }
+}
+
+/* Tooltip bar */
+.tooltip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px 14px;
+  min-height: 48px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-mid);
+}
+
+.tooltipIcon { font-size: 1.4rem; flex-shrink: 0; }
+
+.tooltipName {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--text-bright);
+  margin-bottom: 2px;
+}
+
+.tooltipHint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+}

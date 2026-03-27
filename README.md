@@ -16,7 +16,7 @@ A dark fantasy action/adventure browser RPG built with **React + Vite**. No exte
 - **Defend** to reduce incoming damage on the next hit
 - **Flee** from battles (60% success rate, 100% with Shadowstep perk)
 - **Complete quests** from the Tavern notice board for bonus gold and XP
-- **Achievements** — 22 persistent achievements tracked across all runs, stored independently from save slots
+- **World Map** — animated SVG map showing all 7 locations with fog of war, travel by clicking reachable nodes
 - **Bestiary** — discover all 13 enemy types, track kill counts and first encounter dates
 
 ## 🌳 Skill Tree
@@ -119,7 +119,6 @@ Materials drop during exploration: **Leather Scrap** from the Forest Edge, **Glo
 | Wolf Hunter | Slay 3 Dire Wolves | 60g + 90 XP |
 | Into the Dark | Visit the Dark Wood | 50g + 80 XP |
 | Orc Bane | Slay 3 Orcs | 120g + 200 XP |
-| Shadow Hunter | Defeat 5 Shadow Wolves | 220g + 350 XP |
 | Shrine Seeker | Visit the Ruined Shrine | 70g + 110 XP |
 | Bone Breaker | Slay 3 Skeleton Warriors | 140g + 240 XP |
 | Shade Hunter | Banish 3 Cursed Shades | 150g + 260 XP |
@@ -213,6 +212,7 @@ src/
 ├── achievementData.js     # Achievement definitions and localStorage helpers
 ├── useAchievements.js     # Achievement check hook
 ├── AchievementPanel.jsx   # Achievements & Bestiary tabbed panel
+├── WorldMap.jsx           # Animated SVG world map with fog of war
 ├── InventoryModal.jsx     # View & use carried items
 ├── QuestBoard.jsx         # Quest list with progress & claim rewards
 ├── SkillTreeModal.jsx     # Level-up perk picker

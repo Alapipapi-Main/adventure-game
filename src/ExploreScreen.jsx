@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { LOCATIONS, ENEMIES } from './gameData';
 import styles from './ExploreScreen.module.css';
 
-export default function ExploreScreen({ player, quests, onTravel, onStartBattle, onShop, onCraft, onQuestBoard, onRest, log }) {
+export default function ExploreScreen({ player, quests, onTravel, onStartBattle, onShop, onCraft, onQuestBoard, onRest, onMap, log }) {
   const location = LOCATIONS[player.location];
   const [searching, setSearching] = useState(false);
 
@@ -35,6 +35,14 @@ export default function ExploreScreen({ player, quests, onTravel, onStartBattle,
       <div className={styles.main}>
         <div className={styles.actions}>
           <h3 className={styles.sectionTitle}>Actions</h3>
+
+          <button className={`${styles.actionBtn} ${styles.mapBtn}`} onClick={onMap}>
+            <span>🗺️</span>
+            <div>
+              <div className={styles.btnTitle}>World Map</div>
+              <div className={styles.btnSub}>View all locations & travel</div>
+            </div>
+          </button>
 
           {hasBoss && (
             <button className={`${styles.actionBtn} ${styles.bossBtn}`} onClick={() => onStartBattle(location.boss)}>

@@ -14,6 +14,7 @@ import CraftingModal from './CraftingModal';
 import SkillTreeModal from './SkillTreeModal';
 import AudioSettings from './AudioSettings';
 import AchievementPanel from './AchievementPanel';
+import WorldMap from './WorldMap';
 import { TitleScreen, GameOverScreen, VictoryScreen } from './SpecialScreens';
 import './App.css';
 
@@ -40,6 +41,7 @@ export default function App() {
   const [showQuests,       setShowQuests]       = useState(false);
   const [showAudio,        setShowAudio]        = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showMap,          setShowMap]          = useState(false);
   const [slotPicker,       setSlotPicker]       = useState(null);
   const [newGameSlot,      setNewGameSlot]      = useState(null);
 
@@ -247,6 +249,7 @@ export default function App() {
             onShop={() => setShowShop(true)}
             onCraft={() => setShowCraft(true)}
             onQuestBoard={() => setShowQuests(true)}
+            onMap={() => setShowMap(true)}
             onRest={handleRest}
             log={log}
           />
@@ -271,6 +274,7 @@ export default function App() {
       {showInventory    && <InventoryModal    player={player} difficulty={difficulty} battleState={battleState} onUse={i => handleUseItem(i, !!battleState)} onClose={() => setShowInventory(false)} />}
       {showQuests       && <QuestBoard        quests={quests} onClaim={claimQuest}                       onClose={() => setShowQuests(false)}       />}
       {showAchievements && <AchievementPanel  unlocked={unlocked}                                        onClose={() => setShowAchievements(false)} />}
+      {showMap          && <WorldMap          player={player} visitedLocations={visitedLocations}        onTravel={handleTravel} onClose={() => setShowMap(false)} />}
       {showAudio        && (
         <AudioSettings
           musicVol={musicVol}
