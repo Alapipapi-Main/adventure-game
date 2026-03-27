@@ -119,6 +119,7 @@ Materials drop during exploration: **Leather Scrap** from the Forest Edge, **Glo
 | Wolf Hunter | Slay 3 Dire Wolves | 60g + 90 XP |
 | Into the Dark | Visit the Dark Wood | 50g + 80 XP |
 | Orc Bane | Slay 3 Orcs | 120g + 200 XP |
+| Shadow Hunter | Defeat 5 Shadow Wolves | 220g + 350 XP |
 | Shrine Seeker | Visit the Ruined Shrine | 70g + 110 XP |
 | Bone Breaker | Slay 3 Skeleton Warriors | 140g + 240 XP |
 | Shade Hunter | Banish 3 Cursed Shades | 150g + 260 XP |
